@@ -208,21 +208,43 @@ def check_special_character(text1, text2):
 # enko_smi_text.sort()
 
 
-def get_sync_pair_smi_text(pair_smi_dict, sync_time_option=60):
+def get_sync_pair_smi_text(pair_smi_dict, sync_time_option=1000, special_character_check=True):
     global count
+    sync_pair_smi_text_list = []
     dictList = [[], []]
     for lang_idx, lang_code in enumerate(pair_smi_dict.keys()):
         for item_idx, item in enumerate(pair_smi_dict[lang_code]):
             dictList[lang_idx].append([item, pair_smi_dict[lang_code][item]])
     # write_enko(enko_smi_text, abs_smiPath + os.path.sep + smiItem, "./output")
-    print(len(dictList[0]), len(dictList[1]))
-    for idx, item in enumerate(dictList[0]):
-        # print(count, idx, item, dictList[1][idx])
+
+    for idx, item1 in enumerate(dictList[0]):
         for idx2, item2 in enumerate(dictList[1]):
-            if abs(item[0] - item2[0]) < sync_time_option:
-                if check_special_character(item[1], item2[1]):
+            if abs(item1[0] - item2[0]) < sync_time_option:
+
+                if item1[1].endswith("!") and not item2[1].endswith("!"):
+                    item2[1] = item2[1] + "!"
+                if item2[1].endswith("!") and not item1[1].endswith("!"):
+                    item1[1] = item1[1] + "!"
+
+                if item1[1].endswith("?") and not item2[1].endswith("?"):
+                    item2[1] = item2[1] + "?"
+                if item2[1].endswith("?") and not item1[1].endswith("?"):
+                    item1[1] = item1[1] + "?"
+
+                if not item1[1].endswith("."):
+                    item1[1] = item1[1] + "."
+                if not item2[1].endswith("."):
+                    item2[1] = item2[1] + "."
+
+                if special_character_check:
+                    if check_special_character(item1[1], item2[1]):
+                        count = count + 1
+                        sync_pair_smi_text_list.append([item1, item2])
+                else:
                     count = count + 1
-                    print(count, idx, item, item2)
+                    sync_pair_smi_text_list.append([item1, item2])
+
+    return sync_pair_smi_text_list
 
 
 if __name__ == '__main__':
@@ -239,6 +261,7 @@ if __name__ == '__main__':
             # print(abs_smiPath)
             pair_smi_list = extract_enko(abs_smiPath + os.path.sep + smiItem)
             pair_smi_dict = convert_dict_smi(pair_smi_list)
+            sync_pair_smi_text_list = get_sync_pair_smi_text(pair_smi_dict, sync_time_option=500)
 
-            get_sync_pair_smi_text(pair_smi_dict,90)
-
+            for idx, item in enumerate(sync_pair_smi_text_list):
+                print(idx, item)

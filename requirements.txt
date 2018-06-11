@@ -1,0 +1,5 @@
+numpy
+mecab-python3
+jpype1
+nltk
+spacy
