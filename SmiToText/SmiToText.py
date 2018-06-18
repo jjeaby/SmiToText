@@ -1,10 +1,15 @@
 import os
-import sys
 import re
+import sys
+from collections import Counter
 from operator import itemgetter
-from pprint import pprint
 
 import numpy
+from langdetect import detect
+
+from SmiToText.frequency import word as word_freq
+from SmiToText.tokenizer import mecab
+from SmiToText.tokenizer import nltk
 
 
 def extract_enko(filename):
@@ -208,13 +213,13 @@ def check_special_character(text1, text2):
 # enko_smi_text.sort()
 
 
-def get_sync_pair_smi_text(pair_smi_dict, sync_time_option=1000, special_character_check=True):
+def sync_pair_smi_text(pair_smi_dict, sync_time_option=1000, special_character_check=True):
     global count
     sync_pair_smi_text_list = []
     dictList = [[], []]
     for lang_idx, lang_code in enumerate(pair_smi_dict.keys()):
         for item_idx, item in enumerate(pair_smi_dict[lang_code]):
-            dictList[lang_idx].append([item, pair_smi_dict[lang_code][item]])
+            dictList[lang_idx].append([item, pair_smi_dict[lang_code][item], lang_code])
     # write_enko(enko_smi_text, abs_smiPath + os.path.sep + smiItem, "./output")
 
     for idx, item1 in enumerate(dictList[0]):
@@ -243,8 +248,30 @@ def get_sync_pair_smi_text(pair_smi_dict, sync_time_option=1000, special_charact
                 else:
                     count = count + 1
                     sync_pair_smi_text_list.append([item1, item2])
-
     return sync_pair_smi_text_list
+
+
+
+
+
+def smi_word_tag_count(sync_pair_smi_text_list):
+    count1 = Counter()
+    count2 = Counter()
+
+    for idx, item in enumerate(sync_pair_smi_text_list):
+        # auto lang check True 면 Mecab Tokenizer 실행
+        # auto lang check False 면 Nltk Toeknizer 실행
+        word1_tag_count = word_freq.word_tag_count(item[0][1], auto_lang_check=True)
+        word2_tag_count = word_freq.word_tag_count(item[1][1], auto_lang_check=True)
+
+        count1 = count1 + word1_tag_count
+        count2 = count2 + word2_tag_count
+
+    word1_freq_list = word_freq.word_rank_list(count1)
+    word2_freq_list = word_freq.word_rank_list(count2)
+
+    return [word1_freq_list, word2_freq_list]
+
 
 
 if __name__ == '__main__':
@@ -256,12 +283,20 @@ if __name__ == '__main__':
     abs_smiPath = os.path.abspath(smiPath)
     smiPath_list = os.listdir(smiPath)
     count = 0
+
+    smi_text1_list = {}
+    smi_text2_list = {}
+
+    word1_counter = Counter()
+    word2_counter = Counter()
+
     for smiItem in smiPath_list:
         if smiItem.endswith('.smi'):
             # print(abs_smiPath)
             pair_smi_list = extract_enko(abs_smiPath + os.path.sep + smiItem)
             pair_smi_dict = convert_dict_smi(pair_smi_list)
-            sync_pair_smi_text_list = get_sync_pair_smi_text(pair_smi_dict, sync_time_option=500)
+            sync_pair_smi_text_list = sync_pair_smi_text(pair_smi_dict, sync_time_option=300)
 
             for idx, item in enumerate(sync_pair_smi_text_list):
-                print(idx, item)
+                count = count + 1
+                print(count, idx, item)
