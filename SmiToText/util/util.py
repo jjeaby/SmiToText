@@ -31,3 +31,7 @@ class Util(object):
             directory = path
         if not os.path.exists(directory):
             os.makedirs(directory)
+
+    def rreplace(self, s, old, new, occurrence):
+        li = s.rsplit(old, occurrence)
+        return new.join(li)

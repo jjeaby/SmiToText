@@ -17,7 +17,7 @@ class spacingUtil(object):
 
 
     def snorm(self, string):
-        return S1.sub(' ', string.replace('\t', ' ')).strip()
+        return self.S1.sub(' ', string.replace('\t', ' ')).strip()
 
 
     def open_file(self, filename, mode):
@@ -41,7 +41,8 @@ class spacingUtil(object):
         for line in fid:
             line = line.strip()
             if line == "": continue
-            line = line.decode('utf-8')
+            #print(line)
+            #line = line.decode('utf-8')
             for c in line:
                 if c not in visit:
                     char_rdic.append(c)
@@ -152,7 +153,7 @@ class spacingUtil(object):
         for line in fid:
             line = line.strip()
             if line == "": continue
-            line = line.decode('utf-8')
+            # line = line.decode('utf-8')
             sentence = self.snorm(line)
             pos = 0
             while pos != -1:
@@ -177,7 +178,10 @@ class spacingUtil(object):
                 out.append(sentence[j])
             j += 1
         n_sentence = ''.join(out)
-        return self.snorm(n_sentence).encode('utf-8')
+        print(n_sentence)
+
+        # return self.snorm(n_sentence).encode('utf-8')
+        return self.snorm(n_sentence)
 
 
     # -------------------------------------------------------------------------

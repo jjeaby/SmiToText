@@ -37,6 +37,7 @@ class spacingTrain(object):
 
         # Define a lstm cell with tensorflow
         lstm_cell = tf.contrib.rnn.LSTMCell(n_hidden, forget_bias=1.0, state_is_tuple=False)
+        # lstm_cell = tf.contrib.rnn.LSTMCell(n_hidden, forget_bias=1.0, state_is_tuple=False)
         # Split data because rnn cell needs a list of inputs for the RNN inner loop
         # n_steps splits each of which contains (?, n_hidden)
         # ex) [<tf.Tensor 'split:0' shape=(?, n_hidden) dtype=float32>, ... , <tf.Tensor 'split:n_steps-1' shape=(?, n_hidden) dtype=float32>]
@@ -147,7 +148,7 @@ if __name__ == '__main__':
         for line in fid:
             line = line.strip()
             if line == "": continue
-            line = line.decode('utf-8')
+            # line = line.decode('utf-8')
             sentence = spacingutil.snorm(line)
             pos = 0
             while pos != -1:
