@@ -58,7 +58,7 @@ class koPyCrfsuitSpacing(object):
         if self.verbose:
             print('begin appending data to trainer')
         for sent in setences:
-            x, y = Sentence.sent_to_xy(sent, self.to_feature)
+            x, y = self.sentence.sent_to_xy(sent, self.to_feature)
             x = [[xij for xij in xi if xij in self.feature_vocabulary] for xi in x]
             trainer.append(x, y)
         if self.verbose:
@@ -94,7 +94,7 @@ class koPyCrfsuitSpacing(object):
         self.tagger.open(model_fname)
 
     def correct(self, sent):
-        x, y0 = Sentence.sent_to_xy(sent, self.to_feature)
+        x, y0 = self.sentence.sent_to_xy(sent, self.to_feature)
         y1 = []
 
         b = 0
@@ -108,8 +108,10 @@ class koPyCrfsuitSpacing(object):
 
 if __name__ == '__main__':
     util = Util()
+
     rootDirPath = util.getRootPath('SmiToText')
 
+    print(rootDirPath)
 
     to_feature = CharacterFeatureTransformer(TemplateGenerator(begin=-2,
                                                                end=2,
@@ -122,6 +124,7 @@ if __name__ == '__main__':
     print(y)
 
     train_dataset_fname = rootDirPath + os.path.sep + 'data'+ os.path.sep + 'koDetokenizerData'+ os.path.sep + 'ko_law_common_space.txt'
+    train_dataset_fname = rootDirPath + os.path.sep + 'data'+ os.path.sep + 'koDetokenizerData'+ os.path.sep + '일본어교재+FTA.txt'
     model_fname = rootDirPath + os.path.sep + "koPyCrfsuit-models" + os.path.sep + "koPyCrfsuit_model.model"
 
     correct = koPyCrfsuitSpacing(to_feature)
@@ -135,4 +138,14 @@ if __name__ == '__main__':
 
     sent_output = correct(sent_input)
 
+    print(sent)
+    print(sent_output)
+
+
+    sent = '이것도 너프해 보시지'
+    sent_input = sent.replace(" ", "")
+
+    sent_output = correct(sent_input)
+
+    print(sent)
     print(sent_output)
