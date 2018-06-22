@@ -129,8 +129,8 @@ if __name__ == '__main__':
 
     correct = koPyCrfsuitSpacing(to_feature)
 
-    sentences = correct.train_file_load(train_dataset_fname)
-    correct.train(sentences, model_fname)
+    # sentences = correct.train_file_load(train_dataset_fname)
+    # correct.train(sentences, model_fname)
 
     correct.load_tagger(model_fname)
     sent = 'DAB는, 결정과 관련한 각 위원들의 모든 일당 수수료와 경비에 대한 청구금액이 완전하게 지급될 때 까지는, 결정문을 발급할 의무를 갖지 아니한다.'
