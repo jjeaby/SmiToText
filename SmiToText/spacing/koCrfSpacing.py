@@ -122,13 +122,13 @@ if __name__ == '__main__':
     koSpaceCheck = koCrfSpacing()
 
     #### 학습
-    koSpaceCheck.raw2corpus(rootDirPath + '/data/koDetokenizerData/ko_law_common_space.txt', rootDirPath + '/data/koDetokenizerData/ko_law_common_space.txt.copus')
-    koSpaceCheck.raw2corpus(rootDirPath + '/data/koDetokenizerData/kospacing_Train.txt', rootDirPath + '/data/koDetokenizerData/kospacing_Train.txt.copus')
+    koSpaceCheck.raw2corpus(rootDirPath + '/data/koDetokenizerData/ko_law_common_space.txt', rootDirPath + '/data/koDetokenizerData/Train.txt.copus')
+    koSpaceCheck.raw2corpus(rootDirPath + '/data/koDetokenizerData/kospacing_Train.txt', rootDirPath + '/data/koDetokenizerData/Valid.txt.copus')
     # raw_train.txt에 뭔가 긴 글이 있음
 
 
-    train_sents = koSpaceCheck.corpus2sent(rootDirPath + '/data/koDetokenizerData/ko_law_common_space.txt.copus')
-    test_sents = koSpaceCheck.corpus2sent(rootDirPath + '/data/koDetokenizerData/kospacing_Train.txt.copus')
+    train_sents = koSpaceCheck.corpus2sent(rootDirPath + '/data/koDetokenizerData/Train.txt.copus')
+    test_sents = koSpaceCheck.corpus2sent(rootDirPath + '/data/koDetokenizerData/Valid.txt.copus')
     train_x = [koSpaceCheck.sent2features(sent) for sent in train_sents]
 
     train_y = [koSpaceCheck.sent2tags(sent) for sent in train_sents]
