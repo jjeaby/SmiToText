@@ -14,23 +14,28 @@ class koSoySpacing(object):
         nt = -0.3  # nonspace_threshold
         st = 0.3  # space_threshold
 
-        # model = CountSpace()
-        # model.load_model("/home/jjeaby/Dev/06.rosamia/soyspacing/demo_model/test.model", json_format=False)
-        #
+        model = CountSpace()
+
         rootDirPath = self.util.getRootPath("SmiToText")
         corpus_fname = rootDirPath + os.path.sep + "data" +  os.path.sep + "koDetokenizerData" + os.path.sep + "ko_law_common_space.txt"
         model_fname = rootDirPath + os.path.sep + "kosoy-models" + os.path.sep + "soyspacing.model"
-        model = CountSpace()
-        model.train(corpus_fname)
-        model.save_model(model_fname, json_format=False)
+
+        ### 학습
+        # model.train(corpus_fname)
+        # model.save_model(model_fname, json_format=False)
+
+        ## 모델 로드
         model.load_model(model_fname, json_format=False)
 
         #sent = '이건진짜좋은영화 라라랜드진짜좋은영화'
-        sent = '그일단그구성원인사람들과,,'
+        # sent = '그일단그구성원인사람들과,,'
+        sent = 'DAB는, 결정과 관련한 각 위원들의 모든 일당 수수료와 경비에 대한 청구금액이 완전하게 지급될 때 까지는, 결정문을 발급할 의무를 갖지 아니한다.'
+
+        sent_input = sent.replace( " ", "")
 
         # with parameters
-        sent_corrected_1, tags = model.correct(
-            doc=sent,
+        setn_output_1, tags = model.correct(
+            doc=sent_input,
             verbose=verbose,
             force_abs_threshold=ft,
             nonspace_threshold=nt,
@@ -38,10 +43,11 @@ class koSoySpacing(object):
             min_count=mc)
 
         # without parameters
-        sent_corrected_2, tags = model.correct(sent)
+        setn_output_2, tags = model.correct(sent_input)
 
-        print(sent_corrected_1)
-        print(sent_corrected_2)
+        print(sent)
+        print(setn_output_1)
+        print(setn_output_2)
 
 
 if __name__ == '__main__':
