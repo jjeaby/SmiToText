@@ -164,7 +164,8 @@ if __name__ == '__main__':
                 feed = {x: batch_xs, y_: batch_ys, istate: c_istate, early_stop: count}
                 sess.run(optimizer, feed_dict=feed)
                 pos = next_pos
-            sys.stderr.write('%s th sentence for %s th iterations ... done\n' % (i, seq))
+            if i % 500 == 0 :
+                sys.stderr.write('%s th sentence for %s th iterations ... done\n' % (i, seq))
             i += 1
         spacingutil.close_file(fid)
         # validation
@@ -183,6 +184,7 @@ if __name__ == '__main__':
             sys.stderr.write('save model\n')
             saver.save(sess, checkpoint_dir + '/' + checkpoint_file)
         seq += 1
+    sys.stderr.write('iterations ... complete!!!\n' % (i, seq))
 
     sys.stderr.write('save model(final)\n')
     saver.save(sess, checkpoint_dir + '/' + checkpoint_file)

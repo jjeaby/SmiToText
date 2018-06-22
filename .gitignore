@@ -6,4 +6,9 @@ d.txt
 .idea
 .vscode
 .code
+models_bak/*
+models/*
+kosoy-models/*
+kocrf-models/*
+data/koDetokenizerData
 
