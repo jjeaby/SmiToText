@@ -1,11 +1,11 @@
-import pycrfsuite
-from SmiToText.spacing.koPyCrfsuitSpacingUtil import TemplateGenerator
-from SmiToText.spacing.koPyCrfsuitSpacingUtil import CharacterFeatureTransformer
-from SmiToText.spacing.koPyCrfsuitSpacingUtil import Sentence
-
 import os
 import pprint
 
+import pycrfsuite
+
+from SmiToText.spacing.koPyCrfsuitSpacingUtil import CharacterFeatureTransformer
+from SmiToText.spacing.koPyCrfsuitSpacingUtil import Sentence
+from SmiToText.spacing.koPyCrfsuitSpacingUtil import TemplateGenerator
 from SmiToText.util.util import Util
 
 
@@ -13,6 +13,7 @@ class koPyCrfsuitSpacing(object):
     def __init__(self, to_feature, tagger=None, verbose=False,
                  feature_vocabulary=None,
                  feature_minfreq=0, max_iterations=100, l1_cost=0, l2_cost=1.0):
+        self.sentence = Sentence()
         self.tagger = tagger
         self.to_feature = to_feature
         self.verbose = verbose
@@ -75,7 +76,7 @@ class koPyCrfsuitSpacing(object):
             print('feature scanning: begin with min_count={}'.format(min_count))
 
         for sent in docs:
-            x, _ = Sentence.sent_to_xy(sent, self.to_feature)
+            x, _ = sentence.sent_to_xy(sent, self.to_feature)
             for xi in x:
                 for xij in xi:
                     feature_vocabulary[xij] += 1
@@ -115,8 +116,8 @@ if __name__ == '__main__':
                                                                min_range_length=3,
                                                                max_range_length=3))
 
-    print(str(to_feature))
-    x, y = Sentence.sent_to_xy('이것도 너프해 보시지', to_feature)
+    sentence = Sentence()
+    x, y = sentence.sent_to_xy('이것도 너프해 보시지', to_feature)
     pprint.pprint(x)
     print(y)
 
