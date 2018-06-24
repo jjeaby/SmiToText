@@ -44,7 +44,8 @@ class koPyCrfsuitSpacing(object):
                 doc = doc.replace('\n', '')
                 doc = doc.replace('  ', ' ')
                 train_dataset.append(doc)
-
+                if num_doc % 100 == 9 :
+                    print("Train File's",num_doc,"line Read.")
                 if not doc:
                     continue
 
@@ -124,13 +125,13 @@ if __name__ == '__main__':
     print(y)
 
     train_dataset_fname = rootDirPath + os.path.sep + 'data'+ os.path.sep + 'koDetokenizerData'+ os.path.sep + 'ko_law_common_space.txt'
-    train_dataset_fname = rootDirPath + os.path.sep + 'data'+ os.path.sep + 'koDetokenizerData'+ os.path.sep + '일본어교재+FTA.txt'
+    # train_dataset_fname = rootDirPath + os.path.sep + 'data'+ os.path.sep + 'koDetokenizerData'+ os.path.sep + '일본어교재+FTA.txt'
     model_fname = rootDirPath + os.path.sep + "koPyCrfsuit-models" + os.path.sep + "koPyCrfsuit_model.model"
 
     correct = koPyCrfsuitSpacing(to_feature)
 
-    # sentences = correct.train_file_load(train_dataset_fname)
-    # correct.train(sentences, model_fname)
+    sentences = correct.train_file_load(train_dataset_fname)
+    correct.train(sentences, model_fname)
 
     correct.load_tagger(model_fname)
     sent = 'DAB는, 결정과 관련한 각 위원들의 모든 일당 수수료와 경비에 대한 청구금액이 완전하게 지급될 때 까지는, 결정문을 발급할 의무를 갖지 아니한다.'
