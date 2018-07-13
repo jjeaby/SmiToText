@@ -35,7 +35,8 @@ def mecabTokenizer(sentence, DEBUG=False):
 
 
 def mecabAnalize(sentence, DEBUG=False):
-    sentence = sentence.lower()
+    # sentence = sentence.lower()
+    sentence = sentence.strip()
     mecabConvertSentence = []
 
     if DEBUG == True:

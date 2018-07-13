@@ -22,7 +22,9 @@ class Util(object):
 
     def getRootPath(self, modulename):
         mainModule = pkg_resources.resource_filename(modulename,'')
-        return self.getAbsPath(mainModule)
+        mainPath = self.getAbsPath(mainModule + os.path.sep + ".." )
+
+        return self.getAbsPath(mainPath)
 
     def makeDir(self, path):
         if os.path.isfile(path) :

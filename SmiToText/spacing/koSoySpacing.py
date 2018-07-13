@@ -16,7 +16,7 @@ class koSoySpacing(object):
 
         model = CountSpace()
 
-        rootDirPath = self.util.getRootPath("SmiToText")
+        rootDirPath = self.util.getRootPath("SmiToText.SmiToText")
         corpus_fname = rootDirPath + os.path.sep + "data" +  os.path.sep + "koDetokenizerData" + os.path.sep + "ko_law_common_space.txt"
         model_fname = rootDirPath + os.path.sep + "kosoy-models" + os.path.sep + "soyspacing.model"
 

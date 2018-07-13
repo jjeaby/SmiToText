@@ -117,7 +117,7 @@ class koCrfSpacing(object):
 if __name__ == '__main__':
     util = Util()
 
-    rootDirPath = util.getRootPath('SmiToText')
+    rootDirPath = util.getRootPath('SmiToText.SmiToText')
 
     koSpaceCheck = koCrfSpacing()
 
