@@ -10,5 +10,7 @@ models_bak/*
 models/*
 kosoy-models/*
 kocrf-models/*
+koPyCrfsuit-models/*
 data/koDetokenizerData
-
+__pycache__
+*.pyc
