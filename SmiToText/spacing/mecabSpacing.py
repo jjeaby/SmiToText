@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import sys
+
 from jpype import unicode
 
 import SmiToText.tokenizer.mecab as mecab
@@ -10,78 +12,329 @@ def rreplace(s, old, new, occurrence):
 
 
 def mecabSpacing(sentence, DEBUG=False):
-    mecabAnalizeWord = mecab.mecabAnalize(sentence)
+    split_sp_type = [
+        "SL"
+        # ,"SN"
+        # , "SF"
+        , "SSO"
+        , "SSC"
+        # , "SC"
+        , "SY"]
 
-    stich_type_1 = [
-        "START"
-        , "JKS", "JKC", "JKG", "JKO", "JKB", "JKV", "JKQ", "JX", "JC"
-        , "ETM", "ETN+JX"
-        , "EC", "EF", "EP", "EC"
-        , "VV", "VV+ETM", "VV+EC", "VV+EP"
+    split_not_sp_type = [
+        "SF"
+        , "SC"
+        , "SN"
+        , "NNBC"
+        , "NNP"
+        , "NNB", "NNB+JKS", "NNB+VCP"
+        , "NNG"
+        , "NR"
+        , "NP"
+        , "MM"
+        , "MAG"
+        , "MAJ"
+        , "XPN"
+        , "XR"
+        , "XSV", "XSV+EC", "XSV+EP", "XSV+EF", "XSV", "XSV+ETM", "XSV+EP+EC", "XSV+EP+EC+VX+EF"
+        , "XSN"
+        , "XSA+ETM", "XSA", "XSA+EC", "XSA+EP"
+        , "EF", "EC", "EP"
+        , "EP+EC", "EC+VX+EP", "EP+EP", "EP+EF", "EC+VX+EF", "EC+JX"
+        , "ETM"
+        , "ETN", "ETN+JKO"
+        , "VCP", "VCP+EF", "VCP+ETM", "VCP+EC", "VCP+EP"
+        , "VX+EP", "VV+EP+EP"
+        , "VX+EF"
         , "VX"
-        , "VCP+ETM", "VCP+EC"
-        , "NNG", "NNB", "NNBC", "NNP", "NP"
-        , "MM", "MAG"
-        , "XSN", "XSV+ETM", "XSV+EF"
-        , "XSA+ETM"
-        , "XSV+EC", "XSV+EP"
-        , "IC"
+        , "VV", "VV+EP", "VV+EC", "VV+ETM", "VV+EP+EP"
+        , "JKB+JX"
     ]
 
-    split_type = [
-        "SN", "SL", "SF", "SSO", "SSC", "SC", "SY"]
+    josa_type = [
+        "JKS", "JKC", "JKG", "JKO", "JKB", "JKV", "JKQ", "JX", "JC"
+        , "JKB+JX"
 
-    josa_type = ["JKS", "JKC", "JKG", "JKO", "JKB", "JKV", "JKQ", "JX", "JC"
-        , "NNBC", "NR", "VCP+EC"
+    ]
 
-                 ]
-    # append_type = ["('거', 'NNB')", "('라', 'VCP+EC')", "('비', 'NNG')", "('번', 'NNBC')", "('째', 'XSN')", "('부터', 'JX')",
-    #                "('는', 'JX')", "('가', 'JKS')"
-    #                "('으로', 'JKB')", "('과', 'JC')", "('를', 'JKO')", "('가', 'JKS')",
-    #                "('에', 'JKB')", "('의', 'JKG')", "('들', 'XSN')", "('을', 'JKO')",
-    #                "('된', 'XSV+ETM')", "('스러운', 'XSA+ETM')", "('라고', 'VCP+EC')", "('한다', 'XSV+EC')",
-    #                "('했', 'VV+EP')", "('다', 'EF')",
-    #                "('한', 'XSA+ETM')", "('적', 'XSN')", "('인', 'VCP+ETM')", "('할', 'XSV+ETM')",
-    #                "('했', 'XSV+EP')", "('습니다', 'EF')",
-    #                "('에서', 'JKB')", "('하', 'XSV')", "('고', 'EC')", "('도', 'JX')",
-    #                "('달', 'NNG')", "('이', 'JKS')", "('게', 'EC')" , "('되', 'VV')", "('어', 'EC')",
-    #                "('보', 'VX')", "('려고요', 'EC')", "('은', 'JX')", "('어요', 'EF')",
-    #                "('었', 'EP')", "('되', 'VV')", "('다고', 'EC')", "('해요', 'XSV+EF')",
-    #                "('면', 'EC')", "('에', 'JKB')" ,"('가', 'JKS')"
-    #                ]
-    type_history = []
-
+    debug_history = []
+    prev_dict_word = ('START', 'START')
     mecabSpacingSentence = ""
-    prevDict_word = "('', '')"
 
+    mecabAnalizeWord = mecab.mecabAnalize(sentence)
     for dict_word_idx, dict_word in enumerate(mecabAnalizeWord):
+        debug_history.append(dict_word)
 
-        if DEBUG == True:
-            print(dict_word)
-            print(type_history)
+        mecabSpacingSentence = mecabSpacingSentence + " " + str(dict_word[0])
 
-        if dict_word[1] in stich_type_1:
-            # if str(dict_word) in append_type and prevDict_word[1] not in split_type and prevDict_word[1] not in josa_type:
-            if prevDict_word[1] not in split_type and prevDict_word[1] not in josa_type:
-                mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
-                mecabSpacingSentence = mecabSpacingSentence + str(dict_word[0]) + " "
+        if dict_word[1] in split_sp_type:
+            mecabSpacingSentence = " " + mecabSpacingSentence + " "
+
+        elif dict_word[1] in josa_type or dict_word[1] in split_not_sp_type:
+
+            if dict_word[1] in josa_type:
+                if prev_dict_word[1] not in split_sp_type:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                    mecabSpacingSentence = mecabSpacingSentence + " "
             else:
-                mecabSpacingSentence = mecabSpacingSentence + str(dict_word[0]) + " "
-        elif dict_word[1] in split_type:
-            mecabSpacingSentence = mecabSpacingSentence + " " + str(dict_word[0]) + " "
+                if dict_word[1] in ["SF"] and dict_word[0] in [".", "!", "?"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
 
-        else:
-            mecabSpacingSentence = mecabSpacingSentence + str(dict_word[0])
+                elif dict_word[1] in ["SN"] and dict_word[0] in [","]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
 
-        if dict_word[1] in josa_type:
-            type_history.clear()
-            mecabSpacingSentence = mecabSpacingSentence + " "
-        else:
-            type_history.append(dict_word[1])
+                elif prev_dict_word[1] in ["SN"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
 
-        prevDict_word = dict_word
-        mecabSpacingSentence = str(mecabSpacingSentence).replace("  ", " ")
-    return mecabSpacingSentence.strip()
+                elif dict_word[1] in ["SC"] and dict_word[0] in [","]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+                elif prev_dict_word[1] in ["SC"] and dict_word[1] in ["SN"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+                elif prev_dict_word[1] in ["SY"] and dict_word[1] in ["SN"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+                elif prev_dict_word[1] in ["VA"] and dict_word[1] in ["EC", "EP", "EF"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["VA"] and dict_word[1] in ["ETM", "ETN"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["VA+EP"] and dict_word[1] in ["EF", "EC"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["VA+EC+VX+EP"] and dict_word[1] in ["EF"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+
+                elif prev_dict_word[1] in ["VV"] and dict_word[1] in ["EC", "EC+VX+EP", "EC+JX", "EP", "EF", "ETN",
+                                                                      "ETM",
+                                                                      "EP+EP", "EP+EF", "EP+ETM"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["VV"] and dict_word[1] in ["ETN+JKO", "ETN+JX"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+
+
+                elif prev_dict_word[1] in ["VV+EP"] and dict_word[1] in ["ETM"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["VV+EP"] and dict_word[1] in ["EC", "EF"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["VV+EP+EP"] and dict_word[1] in ["EF"]:
+
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["VV+EC"] and dict_word[1] in ["EF"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["VV+EC"] and dict_word[1] in ["VX", "VX+EP", "VX+EF"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["VV+EC+VX+EP"] and dict_word[1] in ["EF"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+                elif prev_dict_word[1] in ["VV+ETM"] and dict_word[1] in ["MAG"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["VV+ETM"] and dict_word[1] in ["EF"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["VV+ETM"] and dict_word[1] in ["NNB+JKS"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+
+                elif prev_dict_word[1] in ["VX+EP"] and dict_word[1] in ["EF", "EC"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["VX"] and dict_word[1] in ["EP", "EC", "EF", "EP+EF", "EP+EP"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["VX"] and dict_word[1] in ["ETM", "ETN"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+                elif prev_dict_word[1] in ["VCN"] and dict_word[1] in ["ETM"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["VCN"] and dict_word[1] in ["EC", "EP", "EF"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["VCN"] and dict_word[1] in ["EC+VX+EF"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+                elif prev_dict_word[1] in ["VCP"] and dict_word[1] in ["EC", "EF", "EP"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["VCP"] and dict_word[1] in ["ETN", "ETM"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["VCP+EP"] and dict_word[1] in ["EF"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+
+                elif prev_dict_word[1] in ["EC"] and dict_word[1] in ["!VX+EP", "!VX+EF"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+                elif prev_dict_word[1] in ["EP"] and dict_word[1] in ["EF", "EC"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["EC+VX+EP"] and dict_word[1] in ["EF"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["EP"] and dict_word[1] in ["ETM", "ETN"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["EP+EP"] and dict_word[1] in ["EF"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["EP+EP"] and dict_word[1] in ["ETM"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+
+
+                elif prev_dict_word[1] in ["ETN"] and dict_word[1] in ["JKB+JX"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+
+                elif prev_dict_word[1] in ["ETM"] and dict_word[1] in ["! NNB+VCP"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["ETM"] and dict_word[1] in ["NNB+JKS"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+
+                elif prev_dict_word[1] in ["NP"] and dict_word[1] in ["XSN"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["MAG"] and dict_word[1] in ["MM"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+
+                elif prev_dict_word[1] in ["MAG"] and dict_word[1] in ["VCP+EF"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+                elif prev_dict_word[1] in ["NNG"] and dict_word[1] in ["VCP", "VCP+EF", "VCP+EC", "VCP+EP"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["NNG"] and dict_word[1] in ["VV+EP", "VV+ETM"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["NNG"] and dict_word[1] in ["XSV", "XSV+EP", "XSV+EF", "XSV+EC", "XSV",
+                                                                       "XSV+ETM", "XSV+EP+EC", "XSV+EP+EC+VX+EF"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["NNG"] and dict_word[1] in ["XSA", "XSA+ETM", "XSA+EC"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["NNG"] and dict_word[1] in ["XSN"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["NNG"] and dict_word[1] in ["VCP+ETM"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                # elif prev_dict_word[1] in ["NNG"] and dict_word[1] in ["NNP"]:
+                #     mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+                elif prev_dict_word[1] in ["NNBC"] and dict_word[1] in ["XSN"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                # elif prev_dict_word[1] in ["NNBC"] and dict_word[1] in ["NNG"]:
+                #     mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["NNBC"] and dict_word[1] in ["VCP"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["NNBC+JKO"] and dict_word[1] in ["XSN"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+
+                elif prev_dict_word[1] in ["NNB"] and dict_word[1] in ["VCP", "VCP+EF", "VCP+EP", "VCP+EC", "VCP+ETM"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["NNB"] and dict_word[1] in ["XSA", "XSN"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["NNB+VCP"] and dict_word[1] in ["EC"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+
+                elif prev_dict_word[1] in ["NP"] and dict_word[1] in ["VCP+EF", "VCP+EC", "VCP"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+                elif prev_dict_word[1] in ["NR"] and dict_word[1] in ["NR"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["NR"] and dict_word[1] in ["NNBC"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+
+
+                elif prev_dict_word[1] in ["NNP"] and dict_word[1] in ["NNB"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+                elif prev_dict_word[1] in ["XSA"] and dict_word[1] in ["EC", "EF"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["XSA+EC+VX+EP"] and dict_word[1] in ["EF"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["XSA+EP"] and dict_word[1] in ["EF"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+                # elif prev_dict_word[1] in ["XSA+ETM"] and dict_word[1] in ["NNB"]:
+                #     mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+                elif prev_dict_word[1] in ["XSV"] and dict_word[1] in ["EP+EP", "EP+EF"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["XSV+EP"] and dict_word[1] in ["EF", "EC"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["XSV+EP"] and dict_word[1] in ["ETM"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["XSV+EC"] and dict_word[1] in ["VX+EP", "VX"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+
+                elif prev_dict_word[1] in ["XSV"] and dict_word[1] in ["ETN", "ETM"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["XSV"] and dict_word[1] in ["EP+EC", "EP", "EC"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+
+                elif prev_dict_word[1] in ["XSN"] and dict_word[1] in ["VCP", "VCP+ETM"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+                elif prev_dict_word[1] in ["XSN"] and dict_word[1] in ["XSN"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+                elif prev_dict_word[1] in ["XR"] and dict_word[1] in ["XSA+ETM", "XSA+EC", "XSA+EP", "XSA", "XSN"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+                elif prev_dict_word[1] in ["XPN"] and dict_word[1] in ["NNG"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
+
+                else:
+                    mecabSpacingSentence = " " + mecabSpacingSentence + " "
+
+        prev_dict_word = dict_word
+
+        # mecabSpacingSentence = mecabSpacingSentence.replace("  ", " ")
+        # mecabSpacingSentence = mecabSpacingSentence.replace(". ", ".")
+        # mecabSpacingSentence = mecabSpacingSentence.replace(" .", ".")
+        # mecabSpacingSentence = mecabSpacingSentence.replace(" . ", ".")
+        #
+        # mecabSpacingSentence = mecabSpacingSentence.replace(", ", ",")
+        # mecabSpacingSentence = mecabSpacingSentence.replace(" ,", ",")
+        # mecabSpacingSentence = mecabSpacingSentence.replace(" , ", ",")
+        # mecabSpacingSentence = mecabSpacingSentence.replace(",", ", ")
+        #
+        # mecabSpacingSentence = mecabSpacingSentence.replace("\" ", "\"")
+        # mecabSpacingSentence = mecabSpacingSentence.replace(" \"", "\"")
+        # mecabSpacingSentence = mecabSpacingSentence.replace(" \" ", "\"")
+        #
+        # mecabSpacingSentence = mecabSpacingSentence.replace("' ", "'")
+        # mecabSpacingSentence = mecabSpacingSentence.replace(" '", "'")
+        # mecabSpacingSentence = mecabSpacingSentence.replace(" ' ", "'")
+        #
+        # mecabSpacingSentence = mecabSpacingSentence.replace("! ", "!")
+        # mecabSpacingSentence = mecabSpacingSentence.replace(" !", "!")
+        # mecabSpacingSentence = mecabSpacingSentence.replace(" ! ", "!")
+        #
+        # mecabSpacingSentence = mecabSpacingSentence.replace("? ", "?")
+        # mecabSpacingSentence = mecabSpacingSentence.replace(" ?", "?")
+        # mecabSpacingSentence = mecabSpacingSentence.replace(" ? ", "?")
+        #
+        # mecabSpacingSentence = mecabSpacingSentence.replace("/ ", "/")
+        # mecabSpacingSentence = mecabSpacingSentence.replace(" /", "/")
+        # mecabSpacingSentence = mecabSpacingSentence.replace(" / ", "/")
+        #
+        # mecabSpacingSentence = mecabSpacingSentence.replace("?", "? ")
+        #
+        # mecabSpacingSentence = mecabSpacingSentence.replace("\",", "\" ,")
+        # mecabSpacingSentence = mecabSpacingSentence.replace("',", "' ,")
+
+        mecabSpacingSentence = mecabSpacingSentence.replace(" 어 이", " 어이 ")
+        mecabSpacingSentence = mecabSpacingSentence.replace("가건 말 건", "가건말건 ")
+        mecabSpacingSentence = mecabSpacingSentence.replace("승산 비", "승산비")
+        mecabSpacingSentence = mecabSpacingSentence.replace("매달한 번", "매달 한 번")
+        mecabSpacingSentence = mecabSpacingSentence.replace("네브 라스카", "네브라스카")
+        mecabSpacingSentence = mecabSpacingSentence.replace("여전히그", "여전히 그")
+        mecabSpacingSentence = mecabSpacingSentence.replace("기 상통 보관", "기상 통보관")
+        mecabSpacingSentence = mecabSpacingSentence.replace("주시 겠습니까", "주시겠습니까")
+        mecabSpacingSentence = mecabSpacingSentence.replace(", .", ",.")
+
+        mecabSpacingSentence = mecabSpacingSentence.strip()
+
+
+    if DEBUG == True:
+        print(debug_history)
+
+    return mecabSpacingSentence
 
 
 if __name__ == '__main__':
@@ -118,19 +371,37 @@ if __name__ == '__main__':
     #     print(mecabSpacing(text, DEBUG=True))
     #     print("--------------------------------")
 
-    readfile = open("/home/jjeaby/Dev/06.rosamia/SmiToText/data/koDetokenizerData/pure_ko.txt", mode="r",
-                    encoding="utf-8")
-    linenum = 1
+    # readfile = open("/home/jjeaby/Dev/06.rosamia/SmiToText/data/koDetokenizerData/pure_ko.txt", mode="r",
+    #                 encoding="utf-8")
+
+    readfile = open("/home/jjeaby/Dev/06.rosamia/SmiToText/data/20180717-small_jin/AllInOne_KO_20180627_0_VALID.txt",
+                    mode="r", encoding="utf-8")
+    linenum = 0
+
+    if len(sys.argv) == 1:
+        break_linenum = 0
+    else:
+        break_linenum = int(sys.argv[1])
+
     while True:
+
         linenum += 1
         line = readfile.readline()
-        if linenum == 92:
-            break
+
+        if break_linenum != 0:
+            if linenum == break_linenum:
+                break
+        else:
+            if not line:
+                print("NOT LINE : ", '\'' + line + '\'', linenum)
+                break
 
         text = line.strip()
 
-        # print(text.replace(" ", ""))
+        # print(linenum, "--------------------------------")
         # print(mecab.mecabTokenizer(text))
-        print(linenum, "--------------------------------")
-        print(mecabSpacing(text, DEBUG=True))
-        print(linenum, "--------------------------------")
+        mecabOutput = mecabSpacing(text, DEBUG=True)
+        print(text)
+        print(mecabOutput)
+        # print(mecab.mecabTokenizer(mecabOutput.replace(" ", "_")).replace(" _ ", "_").replace(" ", "|") )
+        # print(linenum, "--------------------------------")
