@@ -6,6 +6,22 @@ from jpype import unicode
 import SmiToText.tokenizer.mecab as mecab
 
 
+def find_offsets(string, char):
+    """
+    Find the start of all (possibly-overlapping) instances of needle in haystack
+    """
+    offset = -1
+    offsets_list = []
+    while True:
+        offset = string.find(char, offset + 1)
+        if offset == -1:
+            break
+        else:
+            offsets_list.append(offset)
+
+    return offsets_list
+
+
 def rreplace(s, old, new, occurrence):
     li = s.rsplit(old, occurrence)
     return new.join(li)
@@ -330,6 +346,21 @@ def mecabSpacing(sentence, DEBUG=False):
 
         mecabSpacingSentence = mecabSpacingSentence.strip()
 
+        offsets_list = find_offsets(mecabSpacingSentence, "\"")
+
+        if len(offsets_list) % 2 == 0 and len(offsets_list) > 0:
+            mecabSpacingSentence_char_list = list(mecabSpacingSentence)
+
+            for idx, offset in enumerate(offsets_list):
+                if idx % 2 == 1:
+                    mecabSpacingSentence_char_list[offset - 1] = "\""
+                else:
+                    mecabSpacingSentence_char_list[offset + 1] = "\""
+
+            mecabSpacingSentence = ''.join(mecabSpacingSentence_char_list)
+
+        mecabSpacingSentence = mecabSpacingSentence.replace("\"\"","\"")
+        # mecabSpacingSentence = mecabSpacingSentence.replace("\"","\"")
 
     if DEBUG == True:
         print(debug_history)
@@ -400,7 +431,7 @@ if __name__ == '__main__':
 
         # print(linenum, "--------------------------------")
         # print(mecab.mecabTokenizer(text))
-        mecabOutput = mecabSpacing(text, DEBUG=True)
+        mecabOutput = mecabSpacing(text, DEBUG=False)
         print(text)
         print(mecabOutput)
         # print(mecab.mecabTokenizer(mecabOutput.replace(" ", "_")).replace(" _ ", "_").replace(" ", "|") )

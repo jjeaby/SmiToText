@@ -48,7 +48,7 @@ class koLastCharCheck(object):
     def lastKoTextCheck(self, Text):
 
         split_keyword_list = list(Text)
-        print(split_keyword_list)
+        # print(split_keyword_list)
 
         result = list()
         for keyword in split_keyword_list:
