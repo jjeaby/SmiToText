@@ -14,28 +14,29 @@ class extractNoun(object):
     def __init__(self):
         pass
 
-    def findKoNoun(self, sentence):
+    def findKoNoun(self, sentence, detail=False ):
         nounSet = set([])
 
-        # hannanum = Hannanum()
-        # # print(hannanum.analyze(sentence))
-        # hannanumNoun = hannanum.nouns(sentence)
-        # nounSet.update(hannanumNoun)
+        hannanum = Hannanum()
+        # print(hannanum.analyze(sentence))
+        hannanumNoun = hannanum.nouns(sentence)
+        nounSet.update(hannanumNoun)
         #
-        # kkma = Kkma()
-        # # print(kkma.analyze(sentence))
-        # kkmaNoun = kkma.nouns(sentence)
-        # nounSet.update(kkmaNoun)
-        #
-        komoran = Komoran()
-        # print(komoran.analyze(sentence))
-        komaranNoun = komoran.nouns(sentence)
-        nounSet.update(komaranNoun)
-        #
-        # twitter = Okt()
-        # # print(twitter.analyze(sentence))
-        # twitterNoun = twitter.nouns(sentence)
-        # nounSet.update(twitterNoun)
+        if detail == True :
+            kkma = Kkma()
+            # print(kkma.analyze(sentence))
+            kkmaNoun = kkma.nouns(sentence)
+            nounSet.update(kkmaNoun)
+
+            komoran = Komoran()
+            # print(komoran.analyze(sentence))
+            komaranNoun = komoran.nouns(sentence)
+            nounSet.update(komaranNoun)
+
+            twitter = Okt()
+            # print(twitter.analyze(sentence))
+            twitterNoun = twitter.nouns(sentence)
+            nounSet.update(twitterNoun)
 
         mecabSentence = mecab.nouns(sentence)
         mecabSentence = mecabSentence.split(" ")
