@@ -10,7 +10,7 @@ from SmiToText.tokenizer import nltk
 def nltk_word_tags(text):
     nltkSentence = nltk.nltkTokenizer(text)
     nltkSentence = nltkSentence.split(" ")
-    nltkSentence = [n for n in nltkSentence if len(n) > 1]
+    nltkSentence = [n for n in nltkSentence if len(n) > 0]
     count = Counter(nltkSentence)
     return count
 
@@ -18,7 +18,7 @@ def nltk_word_tags(text):
 def mecab_word_tags(text):
     mecabSentence = mecab.mecabTokenizer(text)
     mecabSentence = mecabSentence.split(" ")
-    mecabSentence = [n for n in mecabSentence if len(n) > 1]
+    mecabSentence = [n for n in mecabSentence if len(n) > 0]
     count = Counter(mecabSentence)
     return count
 
