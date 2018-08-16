@@ -23,11 +23,10 @@ def mecab_word_tags(text):
     return count
 
 
-def word_rank_list(text):
-    count = Counter(text)
+def word_rank_list(countText):
 
     return_list = []  # 명사 빈도수 저장할 변수
-    for n, c in count.most_common():
+    for n, c in countText.most_common():
         temp = {'tag': n, 'count': c}
         return_list.append(temp)
     # most_common 메소드는 정수를 입력받아 객체 안의 명사중 빈도수
@@ -67,4 +66,7 @@ if __name__ == '__main__':
 
         if inputText == 'exit':
             exit(1)
-        print(mecab_word_tags(inputText))
+
+        countText = mecab_word_tags(inputText)
+        print(countText)
+        print(word_rank_list(countText))
