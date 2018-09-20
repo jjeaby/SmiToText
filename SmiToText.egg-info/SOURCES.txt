@@ -1,0 +1,8 @@
+README.md
+setup.py
+SmiToText.egg-info/PKG-INFO
+SmiToText.egg-info/SOURCES.txt
+SmiToText.egg-info/dependency_links.txt
+SmiToText.egg-info/not-zip-safe
+SmiToText.egg-info/requires.txt
+SmiToText.egg-info/top_level.txt

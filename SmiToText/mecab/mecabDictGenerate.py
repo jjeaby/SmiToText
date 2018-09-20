@@ -36,8 +36,17 @@ if __name__ == '__main__':
     rootDirPath = util.getRootPath("SmiToText.SmiToText")
     data_path = rootDirPath + os.path.sep + "data" + os.path.sep + "koDetokenizerData"
 
-    input_filename = data_path + os.path.sep + "국어_명사_초성포함단어제거.txt"
-    output_filename = data_path + os.path.sep + "./국어_명사_초성포함단어제거_mecabUserDict.csv"
+
+
+    # input_filename = data_path + os.path.sep + "국어_명사_초성포함단어제거.txt"
+    # output_filename = data_path + os.path.sep + "./국어_명사_초성포함단어제거_mecabUserDict.csv"
+
+    # input_filename = data_path + os.path.sep + "ttaDict_KO_sort.txt"
+    # output_filename = data_path + os.path.sep + "./ttaDict_KO_sort_mecabUserDict.csv"
+
+    input_filename = data_path + os.path.sep + "나라.txt"
+    output_filename = data_path + os.path.sep + "./나라_mecabUserDict.csv"
+
 
     read_file = open(input_filename, mode='r', encoding='utf-8')
     write_file = open(output_filename, mode='w', encoding='utf-8')
@@ -53,7 +62,7 @@ if __name__ == '__main__':
 
         mecabDictLine = mecabDictGen.dictGenerate(word)
         print(mecabDictLine)
-        # write_file.writelines(mecabDictLine + "\n")
+        write_file.writelines(mecabDictLine + "\n")
 
     print("LINE NUMBER END : ", linenum)
 

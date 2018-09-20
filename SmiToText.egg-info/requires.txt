@@ -1,0 +1,10 @@
+numpy
+mecab-python3
+jpype1
+nltk
+spacy
+langdetect
+soyspacing
+scikit-learn
+python-crfsuite
+caret

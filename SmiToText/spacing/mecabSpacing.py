@@ -369,70 +369,51 @@ def mecabSpacing(sentence, DEBUG=False):
 
 
 if __name__ == '__main__':
-    # while True:
-    #     try:
-    #         inputText = input("\n\n문장을 입력하세요?: \n")
-    #         inputText = unicode(inputText)
-    #     except UnicodeDecodeError:
-    #         print("다시 입력하세요\n")
-    #         continue
-    #
-    #     if inputText == 'exit':
-    #         exit(1)
-    #     print(inputText)
-    #     print(mecab.mecabTokenizer(inputText))
-    #     print(mecabSpacing(inputText))
-
-    # inputText = []
-    # inputText.append("협정의 발효일후1 년이내에 채택하기로 한대한민국의 계획을 환영한다.")
-    # inputText.append("한국어 맞춤법/문법 검사기는 부산")
-    # inputText.append("한국어 맞춤법/문법 검사기는 부산대학교 인공지능연구실과 (주)나라인포테크가 공동으로 만들고 있습니다.")
-    # inputText.append("SK이노베이션, GS, S-Oil, 대림산업, 현대중공업등대규모적자를 내 던")
-    # inputText.append(
-    #     "만약시공자가9.2조항[설계-시공준공기한 ]에 따른 요구조건들에 따라설계-시공을 준공하지못하면, 시공자는 9.6조항[설계-시공과 관련된 지연배상금]에 규정된 상세내용에 따라지연배상금을 지급하여야 한다.")
-    # inputText.append("네 추천서가 정말 기대되는구나.")
-    # inputText.append("처음에 판매자가 배송비 잘못 설정했을거라 생각했는데 오긴 왔네요.")
-    # inputText.append("두 번째 신청부터 상기의 복수입국비자가 발급되는 것임을 확인한다.")
-    # inputText.append("문화체육관광부는 두 번째 신청부터 상기의 복수입국비자가 발급되는 것임을 확인한다.")
-    # inputText.append("\"나는그녀가 사랑 스러운여우 라고 생각 한다\" 라고 26 세의 여배우가 말 했다 .")
-    # for text in inputText:
-    #     # print(text.replace(" ", ""))
-    #     # print(mecab.mecabTokenizer(text))
-    #     print("--------------------------------")
-    #     print(mecabSpacing(text, DEBUG=True))
-    #     print("--------------------------------")
-
-    # readfile = open("/home/jjeaby/Dev/06.rosamia/SmiToText/data/koDetokenizerData/pure_ko.txt", mode="r",
-    #                 encoding="utf-8")
-
-    readfile = open("/home/jjeaby/Dev/06.rosamia/SmiToText/data/20180717-small_jin/AllInOne_KO_20180627_0_VALID.txt",
-                    mode="r", encoding="utf-8")
-    linenum = 0
-
-    if len(sys.argv) == 1:
-        break_linenum = 0
-    else:
-        break_linenum = int(sys.argv[1])
-
     while True:
+        try:
+            inputText = input("\n\n문장을 입력하세요?: \n")
+            inputText = unicode(inputText)
+        except UnicodeDecodeError:
+            print("다시 입력하세요\n")
+            continue
 
-        linenum += 1
-        line = readfile.readline()
+        if inputText == 'exit':
+            exit(1)
+        print(inputText)
+        print(mecab.mecabTokenizer(inputText))
+        print(mecabSpacing(inputText, DEBUG=True))
 
-        if break_linenum != 0:
-            if linenum == break_linenum:
-                break
-        else:
-            if not line:
-                print("NOT LINE : ", '\'' + line + '\'', linenum)
-                break
 
-        text = line.strip()
+#-------------------------------------------------------------------------------------------------------------------
 
-        # print(linenum, "--------------------------------")
-        # print(mecab.mecabTokenizer(text))
-        mecabOutput = mecabSpacing(text, DEBUG=False)
-        print(text)
-        print(mecabOutput)
-        # print(mecab.mecabTokenizer(mecabOutput.replace(" ", "_")).replace(" _ ", "_").replace(" ", "|") )
-        # print(linenum, "--------------------------------")
+    # readfile = open("/home/jjeaby/Dev/06.rosamia/SmiToText/data/20180717-small_jin/AllInOne_KO_20180627_0_VALID.txt",
+    #                 mode="r", encoding="utf-8")
+    # linenum = 0
+    #
+    # if len(sys.argv) == 1:
+    #     break_linenum = 0
+    # else:
+    #     break_linenum = int(sys.argv[1])
+    #
+    # while True:
+    #
+    #     linenum += 1
+    #     line = readfile.readline()
+    #
+    #     if break_linenum != 0:
+    #         if linenum == break_linenum:
+    #             break
+    #     else:
+    #         if not line:
+    #             print("NOT LINE : ", '\'' + line + '\'', linenum)
+    #             break
+    #
+    #     text = line.strip()
+    #
+    #     # print(linenum, "--------------------------------")
+    #     # print(mecab.mecabTokenizer(text))
+    #     mecabOutput = mecabSpacing(text, DEBUG=False)
+    #     print(text)
+    #     print(mecabOutput)
+    #     # print(mecab.mecabTokenizer(mecabOutput.replace(" ", "_")).replace(" _ ", "_").replace(" ", "|") )
+    #     # print(linenum, "--------------------------------")
