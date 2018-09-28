@@ -364,8 +364,17 @@ def mecabSpacing(sentence, DEBUG=False):
 
         mecabSpacingSentence = mecabSpacingSentence.strip()
 
-    offsets_list = find_offsets(mecabSpacingSentence, "\"")
-    print(mecabSpacingSentence)
+        mecabSpacingSentence = spectial_char_pair_blank_remove(mecabSpacingSentence, "\"")
+
+    if DEBUG == True:
+        print(debug_history)
+
+    return mecabSpacingSentence
+
+
+def spectial_char_pair_blank_remove(sentence, char="\""):
+    offsets_list = find_offsets(sentence, char)
+    print(sentence)
     print(offsets_list)
     if len(offsets_list) % 2 == 0 and len(offsets_list) > 0:
         # for idx, offset in enumerate(offsets_list):
@@ -376,24 +385,20 @@ def mecabSpacing(sentence, DEBUG=False):
         #         del b_mecabSpacingSentence[offset - 1]
         # mecabSpacingSentence = b_mecabSpacingSentence.decode(encoding="utf-8")
 
-            mecabSpacingSentence_char_list = list(mecabSpacingSentence)
+        mecabSpacingSentence_char_list = list(sentence)
 
-            for idx, offset in enumerate(offsets_list):
-                if idx % 2 == 1:
-                    mecabSpacingSentence_char_list[offset - 1] = "\""
-                else:
-                    mecabSpacingSentence_char_list[offset + 1] = "\""
+        for idx, offset in enumerate(offsets_list):
+            if idx % 2 == 1:
+                mecabSpacingSentence_char_list[offset - 1] = "`"
+            else:
+                mecabSpacingSentence_char_list[offset + 1] = "`"
 
-            mecabSpacingSentence = ''.join(mecabSpacingSentence_char_list)
+        sentence = ''.join(mecabSpacingSentence_char_list)
 
-    mecabSpacingSentence = mecabSpacingSentence.replace("\"\"", "\"")
+    sentence = sentence.replace(char + "`", char)
+    sentence = sentence.replace("`" + char, char)
 
-
-    if DEBUG == True:
-        print(debug_history)
-
-    print(mecabSpacingSentence)
-    return mecabSpacingSentence
+    return sentence
 
 
 if __name__ == '__main__':
