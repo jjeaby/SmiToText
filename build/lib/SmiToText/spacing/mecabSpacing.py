@@ -5,10 +5,6 @@ from jpype import unicode
 
 import SmiToText.tokenizer.mecab as mecab
 
-from SmiToText.util.util import Util
-
-util = Util()
-
 
 def find_offsets(string, char):
     """
@@ -81,8 +77,6 @@ def mecabSpacing(sentence, DEBUG=False):
     prev_dict_word = ('START', 'START')
     mecabSpacingSentence = ""
 
-    sentence = sentence.replace("\"", "＂")
-
     mecabAnalizeWord = mecab.mecabAnalize(sentence)
     for dict_word_idx, dict_word in enumerate(mecabAnalizeWord):
         debug_history.append(dict_word)
@@ -91,8 +85,6 @@ def mecabSpacing(sentence, DEBUG=False):
 
         if dict_word[1] in split_sp_type:
             mecabSpacingSentence = " " + mecabSpacingSentence + " "
-
-            print(mecabSpacingSentence)
 
         elif dict_word[1] in josa_type or dict_word[1] in split_not_sp_type:
 
@@ -129,23 +121,16 @@ def mecabSpacing(sentence, DEBUG=False):
                     mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
 
 
-                elif prev_dict_word[1] in ["VV"] and dict_word[1] in ["EC", "EC+VX+EP", "EC+JX"]:
+                elif prev_dict_word[1] in ["VV"] and dict_word[1] in ["EC", "EC+VX+EP", "EC+JX", "EP", "EF", "ETN",
+                                                                      "ETM",
+                                                                      "EP+EP", "EP+EF", "EP+ETM"]:
                     mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
-                elif prev_dict_word[1] in ["VV"] and dict_word[1] in ["EP", "EP+EP", "EP+EF", "EP+ETM"]:
-                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
-                elif prev_dict_word[1] in ["VV"] and dict_word[1] in ["EF"]:
-                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
-                elif prev_dict_word[1] in ["VV"] and dict_word[1] in ["ETN", "ETM"]:
-                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
-
                 elif prev_dict_word[1] in ["VV"] and dict_word[1] in ["ETN+JKO", "ETN+JX"]:
                     mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
 
 
 
                 elif prev_dict_word[1] in ["VV+EP"] and dict_word[1] in ["ETM"]:
-                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
-                elif prev_dict_word[1] in ["VV+EP"] and dict_word[1] in ["ETN"]:
                     mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
                 elif prev_dict_word[1] in ["VV+EP"] and dict_word[1] in ["EC", "EF"]:
                     mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
@@ -349,7 +334,6 @@ def mecabSpacing(sentence, DEBUG=False):
         # mecabSpacingSentence = mecabSpacingSentence.replace("\",", "\" ,")
         # mecabSpacingSentence = mecabSpacingSentence.replace("',", "' ,")
 
-        mecabSpacingSentence = mecabSpacingSentence.replace(" 이 같이", " 이같이")
         mecabSpacingSentence = mecabSpacingSentence.replace(" 어 이", " 어이 ")
         mecabSpacingSentence = mecabSpacingSentence.replace("가건 말 건", "가건말건 ")
         mecabSpacingSentence = mecabSpacingSentence.replace("승산 비", "승산비")
@@ -359,23 +343,12 @@ def mecabSpacing(sentence, DEBUG=False):
         mecabSpacingSentence = mecabSpacingSentence.replace("기 상통 보관", "기상 통보관")
         mecabSpacingSentence = mecabSpacingSentence.replace("주시 겠습니까", "주시겠습니까")
         mecabSpacingSentence = mecabSpacingSentence.replace(", .", ",.")
-        mecabSpacingSentence = mecabSpacingSentence.replace(", .", ",.")
-        mecabSpacingSentence = mecabSpacingSentence.replace("＂", "\"")
 
         mecabSpacingSentence = mecabSpacingSentence.strip()
 
-    offsets_list = find_offsets(mecabSpacingSentence, "\"")
-    print(mecabSpacingSentence)
-    print(offsets_list)
-    if len(offsets_list) % 2 == 0 and len(offsets_list) > 0:
-        # for idx, offset in enumerate(offsets_list):
-        #     b_mecabSpacingSentence = bytearray(mecabSpacingSentence.strip(), encoding="utf-8")
-        #     if idx % 2 == 0:
-        #         del b_mecabSpacingSentence[offset + 1]
-        #     else:
-        #         del b_mecabSpacingSentence[offset - 1]
-        # mecabSpacingSentence = b_mecabSpacingSentence.decode(encoding="utf-8")
+        offsets_list = find_offsets(mecabSpacingSentence, "\"")
 
+        if len(offsets_list) % 2 == 0 and len(offsets_list) > 0:
             mecabSpacingSentence_char_list = list(mecabSpacingSentence)
 
             for idx, offset in enumerate(offsets_list):
@@ -386,13 +359,12 @@ def mecabSpacing(sentence, DEBUG=False):
 
             mecabSpacingSentence = ''.join(mecabSpacingSentence_char_list)
 
-    mecabSpacingSentence = mecabSpacingSentence.replace("\"\"", "\"")
-
+        mecabSpacingSentence = mecabSpacingSentence.replace("\"\"","\"")
+        # mecabSpacingSentence = mecabSpacingSentence.replace("\"","\"")
 
     if DEBUG == True:
         print(debug_history)
 
-    print(mecabSpacingSentence)
     return mecabSpacingSentence
 
 
@@ -411,36 +383,37 @@ if __name__ == '__main__':
         print(mecab.mecabTokenizer(inputText))
         print(mecabSpacing(inputText, DEBUG=True))
 
-# -------------------------------------------------------------------------------------------------------------------
 
-# readfile = open("/home/jjeaby/Dev/06.rosamia/SmiToText/data/20180717-small_jin/AllInOne_KO_20180627_0_VALID.txt",
-#                 mode="r", encoding="utf-8")
-# linenum = 0
-#
-# if len(sys.argv) == 1:
-#     break_linenum = 0
-# else:
-#     break_linenum = int(sys.argv[1])
-#
-# while True:
-#
-#     linenum += 1
-#     line = readfile.readline()
-#
-#     if break_linenum != 0:
-#         if linenum == break_linenum:
-#             break
-#     else:
-#         if not line:
-#             print("NOT LINE : ", '\'' + line + '\'', linenum)
-#             break
-#
-#     text = line.strip()
-#
-#     # print(linenum, "--------------------------------")
-#     # print(mecab.mecabTokenizer(text))
-#     mecabOutput = mecabSpacing(text, DEBUG=False)
-#     print(text)
-#     print(mecabOutput)
-#     # print(mecab.mecabTokenizer(mecabOutput.replace(" ", "_")).replace(" _ ", "_").replace(" ", "|") )
-#     # print(linenum, "--------------------------------")
+#-------------------------------------------------------------------------------------------------------------------
+
+    # readfile = open("/home/jjeaby/Dev/06.rosamia/SmiToText/data/20180717-small_jin/AllInOne_KO_20180627_0_VALID.txt",
+    #                 mode="r", encoding="utf-8")
+    # linenum = 0
+    #
+    # if len(sys.argv) == 1:
+    #     break_linenum = 0
+    # else:
+    #     break_linenum = int(sys.argv[1])
+    #
+    # while True:
+    #
+    #     linenum += 1
+    #     line = readfile.readline()
+    #
+    #     if break_linenum != 0:
+    #         if linenum == break_linenum:
+    #             break
+    #     else:
+    #         if not line:
+    #             print("NOT LINE : ", '\'' + line + '\'', linenum)
+    #             break
+    #
+    #     text = line.strip()
+    #
+    #     # print(linenum, "--------------------------------")
+    #     # print(mecab.mecabTokenizer(text))
+    #     mecabOutput = mecabSpacing(text, DEBUG=False)
+    #     print(text)
+    #     print(mecabOutput)
+    #     # print(mecab.mecabTokenizer(mecabOutput.replace(" ", "_")).replace(" _ ", "_").replace(" ", "|") )
+    #     # print(linenum, "--------------------------------")

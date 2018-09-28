@@ -8,23 +8,23 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 
 install_requires = [
-    "numpy",
-    "mecab-python3",
-    "jpype1",
-    "nltk",
-    "spacy",
-    "langdetect",
-    "soyspacing",
+    #"numpy",
+    #"mecab-python3",
+    #"jpype1",
+    #"nltk",
+    #"spacy",
+    #"langdetect",
+    #"soyspacing",
     #"scipy",
-    "scikit-learn",
-    "python-crfsuite",
+    #"scikit-learn",
+    #"python-crfsuite",
     #"tensorflow==1.8.0",
-    "caret",
+    #"caret",
 
 ]
 setup(
     name='SmiToText',
-    version='0.131',
+    version='0.134 ',
     py_modules = ['SmiToText'],
     packages=find_packages(exclude=['tests']),
     install_requires=install_requires,
