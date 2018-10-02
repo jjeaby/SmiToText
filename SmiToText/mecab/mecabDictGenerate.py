@@ -27,6 +27,28 @@ class mecabDictGenerate(object):
             mecabDictLine = word + ",,,," + posTag + ",*,F," + word + ",*,*,*,*"
         return mecabDictLine
 
+    def mecab_dict_gen_from_file(self, input_filename, output_filename):
+
+        read_file = open(input_filename, mode='r', encoding='utf-8')
+        write_file = open(output_filename, mode='w', encoding='utf-8')
+
+        linenum = 0
+        while True:
+            word = read_file.readline()
+            word = word.strip()
+            linenum += 1
+            if not word:
+                break
+
+            mecabDictLine = mecabDictGen.dictGenerate(word)
+            print(mecabDictLine)
+            write_file.writelines(mecabDictLine + "\n")
+
+        print("LINE NUMBER END : ", linenum)
+
+        write_file.close()
+        read_file.close()
+
 
 if __name__ == '__main__':
 
@@ -36,8 +58,6 @@ if __name__ == '__main__':
     rootDirPath = util.getRootPath("SmiToText.SmiToText")
     data_path = rootDirPath + os.path.sep + "data" + os.path.sep + "koDetokenizerData"
 
-
-
     # input_filename = data_path + os.path.sep + "국어_명사_초성포함단어제거.txt"
     # output_filename = data_path + os.path.sep + "./국어_명사_초성포함단어제거_mecabUserDict.csv"
 
@@ -46,7 +66,6 @@ if __name__ == '__main__':
 
     input_filename = data_path + os.path.sep + "나라.txt"
     output_filename = data_path + os.path.sep + "./나라_mecabUserDict.csv"
-
 
     read_file = open(input_filename, mode='r', encoding='utf-8')
     write_file = open(output_filename, mode='w', encoding='utf-8')
