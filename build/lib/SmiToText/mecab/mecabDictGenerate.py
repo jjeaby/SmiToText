@@ -40,7 +40,7 @@ class mecabDictGenerate(object):
             if not word:
                 break
 
-            mecabDictLine = mecabDictGen.dictGenerate(word)
+            mecabDictLine = self.dictGenerate(word)
             print(mecabDictLine)
             write_file.writelines(mecabDictLine + "\n")
 
@@ -67,23 +67,25 @@ if __name__ == '__main__':
     input_filename = data_path + os.path.sep + "나라.txt"
     output_filename = data_path + os.path.sep + "./나라_mecabUserDict.csv"
 
-    read_file = open(input_filename, mode='r', encoding='utf-8')
-    write_file = open(output_filename, mode='w', encoding='utf-8')
+    mecabDictGen.mecab_dict_gen_from_file(input_filename, "/home/jjeaby/Dev/06.rosamia/SmiToText/a.txt")
 
-    linenum = 0
-    while True:
-        word = read_file.readline()
-        word = word.strip()
-        isLastChar = 0
-        linenum += 1
-        if not word:
-            break
-
-        mecabDictLine = mecabDictGen.dictGenerate(word)
-        print(mecabDictLine)
-        write_file.writelines(mecabDictLine + "\n")
-
-    print("LINE NUMBER END : ", linenum)
-
-    write_file.close()
-    read_file.close()
+    # read_file = open(input_filename, mode='r', encoding='utf-8')
+    # write_file = open(output_filename, mode='w', encoding='utf-8')
+    #
+    # linenum = 0
+    # while True:
+    #     word = read_file.readline()
+    #     word = word.strip()
+    #     isLastChar = 0
+    #     linenum += 1
+    #     if not word:
+    #         break
+    #
+    #     mecabDictLine = mecabDictGen.dictGenerate(word)
+    #     print(mecabDictLine)
+    #     write_file.writelines(mecabDictLine + "\n")
+    #
+    # print("LINE NUMBER END : ", linenum)
+    #
+    # write_file.close()
+    # read_file.close()

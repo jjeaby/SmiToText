@@ -11,6 +11,7 @@ SmiToText/frequency/__init__.py
 SmiToText/frequency/word.py
 SmiToText/mecab/__init__.py
 SmiToText/mecab/mecabDictGenerate.py
+SmiToText/mecab/mecabdict_file_gen.py
 SmiToText/spacing/__init__.py
 SmiToText/spacing/koCrfSpacing.py
 SmiToText/spacing/koPyCrfsuitSpacing.py
@@ -25,3 +26,7 @@ SmiToText/tokenizer/mecab.py
 SmiToText/tokenizer/nltk.py
 SmiToText/util/__init__.py
 SmiToText/util/util.py
+SmiToText/wordcheck/__init__.py
+SmiToText/wordcheck/extractNoun.py
+SmiToText/wordcheck/koLastCharCheck.py
+SmiToText/wordcheck/koNounExtract.py
