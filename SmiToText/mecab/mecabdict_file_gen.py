@@ -1,7 +1,11 @@
 import argparse
 from SmiToText.mecab.mecabDictGenerate import mecabDictGenerate
 
-mecabDictGen = mecabDictGenerate()
+
+def mecabdict_file_gen(input, output):
+    mecabDictGen = mecabDictGenerate()
+    mecabDictGen.mecab_dict_gen_from_file(str(args.input), str(args.output))
+
 
 if __name__ == '__main__':
 
@@ -19,4 +23,7 @@ if __name__ == '__main__':
         print("output file is invalid!")
         exit(1)
 
-    mecabDictGen.mecab_dict_gen_from_file(str(args.input), str(args.output))
+    input = str(args.input)
+    output = str(args.output)
+
+    mecabdict_file_gen(input, output)

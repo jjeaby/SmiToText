@@ -24,7 +24,7 @@ install_requires = [
 ]
 setup(
     name='SmiToText',
-    version='0.135 ',
+    version='0.136',
     py_modules = ['SmiToText'],
     packages=find_packages(exclude=['tests']),
     install_requires=install_requires,
