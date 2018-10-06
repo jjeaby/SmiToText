@@ -39,12 +39,14 @@ def mecabSpacing(sentence, DEBUG=False):
         , "SSO"
         , "SSC"
         # , "SC"
-        , "SY"]
+        , "SY"
+        ]
 
     split_not_sp_type = [
         "SF"
         , "SC"
         , "SN"
+        , "SE"
         , "NNBC"
         , "NNP"
         , "NNB", "NNB+JKS", "NNB+VCP"
@@ -118,6 +120,7 @@ def mecabSpacing(sentence, DEBUG=False):
 
                 elif prev_dict_word[1] in ["SY"] and dict_word[1] in ["SN"]:
                     mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
+
 
                 elif prev_dict_word[1] in ["VA"] and dict_word[1] in ["EC", "EP", "EF"]:
                     mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
@@ -220,6 +223,8 @@ def mecabSpacing(sentence, DEBUG=False):
                 elif prev_dict_word[1] in ["MAG"] and dict_word[1] in ["MM"]:
                     mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
 
+                elif prev_dict_word[1] in ["NNG"] and dict_word[1] in ["SE"]:
+                    mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
 
                 elif prev_dict_word[1] in ["MAG"] and dict_word[1] in ["VCP+EF"]:
                     mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
@@ -314,57 +319,46 @@ def mecabSpacing(sentence, DEBUG=False):
 
         prev_dict_word = dict_word
 
-        # mecabSpacingSentence = mecabSpacingSentence.replace("  ", " ")
-        # mecabSpacingSentence = mecabSpacingSentence.replace(". ", ".")
-        # mecabSpacingSentence = mecabSpacingSentence.replace(" .", ".")
-        # mecabSpacingSentence = mecabSpacingSentence.replace(" . ", ".")
-        #
-        # mecabSpacingSentence = mecabSpacingSentence.replace(", ", ",")
-        # mecabSpacingSentence = mecabSpacingSentence.replace(" ,", ",")
-        # mecabSpacingSentence = mecabSpacingSentence.replace(" , ", ",")
-        # mecabSpacingSentence = mecabSpacingSentence.replace(",", ", ")
-        #
-        # mecabSpacingSentence = mecabSpacingSentence.replace("\" ", "\"")
-        # mecabSpacingSentence = mecabSpacingSentence.replace(" \"", "\"")
-        # mecabSpacingSentence = mecabSpacingSentence.replace(" \" ", "\"")
-        #
-        # mecabSpacingSentence = mecabSpacingSentence.replace("' ", "'")
-        # mecabSpacingSentence = mecabSpacingSentence.replace(" '", "'")
-        # mecabSpacingSentence = mecabSpacingSentence.replace(" ' ", "'")
-        #
-        # mecabSpacingSentence = mecabSpacingSentence.replace("! ", "!")
-        # mecabSpacingSentence = mecabSpacingSentence.replace(" !", "!")
-        # mecabSpacingSentence = mecabSpacingSentence.replace(" ! ", "!")
-        #
-        # mecabSpacingSentence = mecabSpacingSentence.replace("? ", "?")
-        # mecabSpacingSentence = mecabSpacingSentence.replace(" ?", "?")
-        # mecabSpacingSentence = mecabSpacingSentence.replace(" ? ", "?")
-        #
-        # mecabSpacingSentence = mecabSpacingSentence.replace("/ ", "/")
-        # mecabSpacingSentence = mecabSpacingSentence.replace(" /", "/")
-        # mecabSpacingSentence = mecabSpacingSentence.replace(" / ", "/")
-        #
-        # mecabSpacingSentence = mecabSpacingSentence.replace("?", "? ")
-        #
-        # mecabSpacingSentence = mecabSpacingSentence.replace("\",", "\" ,")
-        # mecabSpacingSentence = mecabSpacingSentence.replace("',", "' ,")
-
-        mecabSpacingSentence = mecabSpacingSentence.replace(" 이 같이", " 이같이")
-        mecabSpacingSentence = mecabSpacingSentence.replace(" 어 이", " 어이 ")
-        mecabSpacingSentence = mecabSpacingSentence.replace("가건 말 건", "가건말건 ")
-        mecabSpacingSentence = mecabSpacingSentence.replace("승산 비", "승산비")
-        mecabSpacingSentence = mecabSpacingSentence.replace("매달한 번", "매달 한 번")
-        mecabSpacingSentence = mecabSpacingSentence.replace("네브 라스카", "네브라스카")
-        mecabSpacingSentence = mecabSpacingSentence.replace("여전히그", "여전히 그")
-        mecabSpacingSentence = mecabSpacingSentence.replace("기 상통 보관", "기상 통보관")
-        mecabSpacingSentence = mecabSpacingSentence.replace("주시 겠습니까", "주시겠습니까")
-        mecabSpacingSentence = mecabSpacingSentence.replace(", .", ",.")
-        mecabSpacingSentence = mecabSpacingSentence.replace(", .", ",.")
+        #Todo 특수 기호를 키보드에 있는 키호로 변화 필요
         mecabSpacingSentence = mecabSpacingSentence.replace("＂", "\"")
+        mecabSpacingSentence = mecabSpacingSentence.replace("`", "'")
+        mecabSpacingSentence = mecabSpacingSentence.replace("‘`", "'")
+        mecabSpacingSentence = mecabSpacingSentence.replace("’", "'")
+        mecabSpacingSentence = mecabSpacingSentence.replace("'", "'")
+        mecabSpacingSentence = mecabSpacingSentence.replace("`", "'")
+        mecabSpacingSentence = mecabSpacingSentence.replace("‘", "'")
+        mecabSpacingSentence = mecabSpacingSentence.replace("'", "'")
+        mecabSpacingSentence = mecabSpacingSentence.replace("‘", "'")
+
+
 
         mecabSpacingSentence = mecabSpacingSentence.strip()
 
-        mecabSpacingSentence = spectial_char_pair_blank_remove(mecabSpacingSentence, "\"")
+
+    mecabSpacingSentence = spectial_char_pair_blank_remove(mecabSpacingSentence, "\"")
+    mecabSpacingSentence = spectial_char_pair_blank_remove(mecabSpacingSentence, "'")
+
+    mecabSpacingSentence = mecabSpacingSentence.replace(" 이 같이", " 이같이")
+    mecabSpacingSentence = mecabSpacingSentence.replace(" 어 이", " 어이 ")
+    mecabSpacingSentence = mecabSpacingSentence.replace("가건 말 건", "가건말건 ")
+    mecabSpacingSentence = mecabSpacingSentence.replace("승산 비", "승산비")
+    mecabSpacingSentence = mecabSpacingSentence.replace("매달한 번", "매달 한 번")
+    mecabSpacingSentence = mecabSpacingSentence.replace("네브 라스카", "네브라스카")
+    mecabSpacingSentence = mecabSpacingSentence.replace("여전히그", "여전히 그")
+    mecabSpacingSentence = mecabSpacingSentence.replace("기 상통 보관", "기상 통보관")
+    mecabSpacingSentence = mecabSpacingSentence.replace("주시 겠습니까", "주시겠습니까")
+    mecabSpacingSentence = mecabSpacingSentence.replace(", .", ",.")
+    mecabSpacingSentence = mecabSpacingSentence.replace(", .", ",.")
+    mecabSpacingSentence = mecabSpacingSentence.replace(" · ", "·")
+    mecabSpacingSentence = mecabSpacingSentence.replace("· ", "·")
+    mecabSpacingSentence = mecabSpacingSentence.replace(" …", "…")
+    mecabSpacingSentence = mecabSpacingSentence.replace("  ", " ")
+    mecabSpacingSentence = mecabSpacingSentence.replace(" / ", "/")
+    mecabSpacingSentence = mecabSpacingSentence.replace("[ ", "[")
+    mecabSpacingSentence = mecabSpacingSentence.replace(" ]", "]")
+    mecabSpacingSentence = mecabSpacingSentence.replace("( ", "(")
+    mecabSpacingSentence = mecabSpacingSentence.replace(" )", ")")
+    mecabSpacingSentence = mecabSpacingSentence.replace(" ,", ",")
 
     if DEBUG == True:
         print(debug_history)
@@ -373,32 +367,27 @@ def mecabSpacing(sentence, DEBUG=False):
 
 
 def spectial_char_pair_blank_remove(sentence, char="\""):
-    offsets_list = find_offsets(sentence, char)
-    print(sentence)
-    print(offsets_list)
-    if len(offsets_list) % 2 == 0 and len(offsets_list) > 0:
-        # for idx, offset in enumerate(offsets_list):
-        #     b_mecabSpacingSentence = bytearray(mecabSpacingSentence.strip(), encoding="utf-8")
-        #     if idx % 2 == 0:
-        #         del b_mecabSpacingSentence[offset + 1]
-        #     else:
-        #         del b_mecabSpacingSentence[offset - 1]
-        # mecabSpacingSentence = b_mecabSpacingSentence.decode(encoding="utf-8")
+    sentence = sentence + "     "
+    offsets_list_length = int(len(find_offsets(sentence, char)))
 
-        mecabSpacingSentence_char_list = list(sentence)
+    print("[", sentence, "]")
+    for idx in range(offsets_list_length):
+        offsets_list = find_offsets(sentence, char)
+        print("idx", idx, sentence)
 
-        for idx, offset in enumerate(offsets_list):
-            if idx % 2 == 1:
-                mecabSpacingSentence_char_list[offset - 1] = "`"
-            else:
-                mecabSpacingSentence_char_list[offset + 1] = "`"
+        if (idx % 2 == 0):
+            if (sentence[offsets_list[idx] + 1] == " "):
+                sentence = sentence[:offsets_list[idx] + 1] + sentence[(offsets_list[idx] + 2):]
+        else:
+            if (sentence[offsets_list[idx] - 1] == " "):
+                sentence = sentence[:offsets_list[idx] - 1] + sentence[(offsets_list[idx]):]
+            if (sentence[offsets_list[idx] - 1] == char):
+                sentence = sentence[:offsets_list[idx]] + " " + sentence[(offsets_list[idx]):]
 
-        sentence = ''.join(mecabSpacingSentence_char_list)
 
-    sentence = sentence.replace(char + "`", char)
-    sentence = sentence.replace("`" + char, char)
 
-    return sentence
+
+    return sentence.strip()
 
 
 if __name__ == '__main__':
