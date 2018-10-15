@@ -13,21 +13,23 @@ class mecabDictGenerate(object):
 
         self.rootDirPath = self.util.getRootPath("SmiToText.SmiToText")
 
-    def dictGenerate(self, word, posTag="NNG"):
+    def dictGenerate(self, word, posTag="NNG", kind=''):
         isLastChar = self.kolastChar.lastKoTextCheck(word)
+        if kind:
+            kind = kind + '-'
 
         # 포커스 인,,,,NNG,*,T,포커스 인,*,*,*,*
         if isLastChar == 1:
             # print(line + ",,,,NNG,*,T,추가-" + line + ",*,*,*,*")
             # write_file.writelines(word + ",,,,NNG,*,T,추가-" + word + ",*,*,*,*" + "\n")
-            mecabDictLine = word + ",,,," + posTag + ",*,T," + word + ",*,*,*,*"
+            mecabDictLine = word + ",,,," + posTag + ",*,T," + kind + word + ",*,*,*,*"
         else:
             # print(line + ",,,,NNG,*,F,추가-" + line + ",*,*,*,*")
             # write_file.writelines(word + ",,,,NNG,*,F,추가-" + word + ",*,*,*,*" + "\n")
-            mecabDictLine = word + ",,,," + posTag + ",*,F," + word + ",*,*,*,*"
+            mecabDictLine = word + ",,,," + posTag + ",*,F," + kind + word + ",*,*,*,*"
         return mecabDictLine
 
-    def mecab_dict_gen_from_file(self, input_filename, output_filename):
+    def mecab_dict_gen_from_file(self, input_filename, output_filename, posTag='NNG', kind=''):
 
         read_file = open(input_filename, mode='r', encoding='utf-8')
         write_file = open(output_filename, mode='w', encoding='utf-8')
@@ -40,9 +42,12 @@ class mecabDictGenerate(object):
             if not word:
                 break
 
-            mecabDictLine = self.dictGenerate(word)
+            mecabDictLine = self.dictGenerate(word, posTag=posTag, kind=kind)
             print(mecabDictLine)
-            write_file.writelines(mecabDictLine + "\n")
+            if linenum > 1 :
+                write_file.writelines("\n")
+
+            write_file.writelines(mecabDictLine )
 
         print("LINE NUMBER END : ", linenum)
 
@@ -51,7 +56,6 @@ class mecabDictGenerate(object):
 
 
 if __name__ == '__main__':
-
     util = Util()
     mecabDictGen = mecabDictGenerate()
 

@@ -115,7 +115,7 @@ def mecabSpacing(sentence, DEBUG=False):
                 elif dict_word[1] in ["SC"] and dict_word[0] in [","]:
                     mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
 
-                elif prev_dict_word[1] in ["SC"] and dict_word[1] in ["SN"]:
+                elif prev_dict_word[1] in ["SC"] and dict_word[1] in ["SN"] and util.is_int(dict_word[1][0]):
                     mecabSpacingSentence = rreplace(mecabSpacingSentence, " ", "", 1)
 
                 elif prev_dict_word[1] in ["SY"] and dict_word[1] in ["SN"]:
@@ -371,20 +371,30 @@ def spectial_char_pair_blank_remove(sentence, char="\""):
     print("[", sentence, "]")
     for idx in range(offsets_list_length):
         offsets_list = find_offsets(sentence, char)
-        print("idx", idx, sentence)
 
         if (idx % 2 == 0):
 
             if (sentence[offsets_list[idx] + 1] == " "):
                 sentence = sentence[:offsets_list[idx] + 1] + sentence[(offsets_list[idx] + 2):]
         else:
-            if (sentence[offsets_list[idx] + 2] == "."):
-                sentence = sentence[:offsets_list[idx]] + sentence[(offsets_list[idx] + 2):]
+
+            # if (sentence[offsets_list[idx] + 1] == "."):
+            #     print("3ASdF")
+            #     sentence = sentence[:offsets_list[idx]] + sentence[(offsets_list[idx] + 1):]
 
             if (sentence[offsets_list[idx] - 1] == " "):
                 sentence = sentence[:offsets_list[idx] - 1] + sentence[(offsets_list[idx]):]
+
             if (sentence[offsets_list[idx] - 1] == char):
                 sentence = sentence[:offsets_list[idx]] + " " + sentence[(offsets_list[idx]):]
+
+            if (sentence[offsets_list[idx] + 1 ] == "."):
+                sentence = sentence[:offsets_list[idx]] + sentence[(offsets_list[idx]+1):]
+
+            if (sentence[offsets_list[idx] + 1 ] == ","):
+                sentence = sentence[:offsets_list[idx]] + sentence[(offsets_list[idx]+1):]
+
+        print("idx", idx, sentence)
 
     return sentence.strip()
 

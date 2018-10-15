@@ -40,7 +40,7 @@ def mecabSpacing(sentence, DEBUG=False):
         , "SSC"
         # , "SC"
         , "SY"
-        ]
+    ]
 
     split_not_sp_type = [
         "SF"
@@ -319,7 +319,7 @@ def mecabSpacing(sentence, DEBUG=False):
 
         prev_dict_word = dict_word
 
-        #Todo 특수 기호를 키보드에 있는 키호로 변화 필요
+        # Todo 특수 기호를 키보드에 있는 키호로 변화 필요
         mecabSpacingSentence = mecabSpacingSentence.replace("＂", "\"")
         mecabSpacingSentence = mecabSpacingSentence.replace("`", "'")
         mecabSpacingSentence = mecabSpacingSentence.replace("‘`", "'")
@@ -330,10 +330,7 @@ def mecabSpacing(sentence, DEBUG=False):
         mecabSpacingSentence = mecabSpacingSentence.replace("'", "'")
         mecabSpacingSentence = mecabSpacingSentence.replace("‘", "'")
 
-
-
         mecabSpacingSentence = mecabSpacingSentence.strip()
-
 
     mecabSpacingSentence = spectial_char_pair_blank_remove(mecabSpacingSentence, "\"")
     mecabSpacingSentence = spectial_char_pair_blank_remove(mecabSpacingSentence, "'")
@@ -347,6 +344,7 @@ def mecabSpacing(sentence, DEBUG=False):
     mecabSpacingSentence = mecabSpacingSentence.replace("여전히그", "여전히 그")
     mecabSpacingSentence = mecabSpacingSentence.replace("기 상통 보관", "기상 통보관")
     mecabSpacingSentence = mecabSpacingSentence.replace("주시 겠습니까", "주시겠습니까")
+    mecabSpacingSentence = mecabSpacingSentence.replace(". ..", "...")
     mecabSpacingSentence = mecabSpacingSentence.replace(", .", ",.")
     mecabSpacingSentence = mecabSpacingSentence.replace(", .", ",.")
     mecabSpacingSentence = mecabSpacingSentence.replace(" · ", "·")
@@ -373,19 +371,30 @@ def spectial_char_pair_blank_remove(sentence, char="\""):
     print("[", sentence, "]")
     for idx in range(offsets_list_length):
         offsets_list = find_offsets(sentence, char)
-        print("idx", idx, sentence)
 
         if (idx % 2 == 0):
+
             if (sentence[offsets_list[idx] + 1] == " "):
                 sentence = sentence[:offsets_list[idx] + 1] + sentence[(offsets_list[idx] + 2):]
         else:
+
+            # if (sentence[offsets_list[idx] + 1] == "."):
+            #     print("3ASdF")
+            #     sentence = sentence[:offsets_list[idx]] + sentence[(offsets_list[idx] + 1):]
+
             if (sentence[offsets_list[idx] - 1] == " "):
                 sentence = sentence[:offsets_list[idx] - 1] + sentence[(offsets_list[idx]):]
+
             if (sentence[offsets_list[idx] - 1] == char):
                 sentence = sentence[:offsets_list[idx]] + " " + sentence[(offsets_list[idx]):]
 
+            if (sentence[offsets_list[idx] + 1 ] == "."):
+                sentence = sentence[:offsets_list[idx]] + sentence[(offsets_list[idx]+1):]
 
+            if (sentence[offsets_list[idx] + 1 ] == ","):
+                sentence = sentence[:offsets_list[idx]] + sentence[(offsets_list[idx]+1):]
 
+        print("idx", idx, sentence)
 
     return sentence.strip()
 
