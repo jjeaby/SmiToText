@@ -44,10 +44,7 @@ class mecabDictGenerate(object):
 
             mecabDictLine = self.dictGenerate(word, posTag=posTag, kind=kind)
             print(mecabDictLine)
-            if linenum > 1 :
-                write_file.writelines("\n")
-
-            write_file.writelines(mecabDictLine )
+            write_file.writelines(mecabDictLine + "\n")
 
         print("LINE NUMBER END : ", linenum)
 
