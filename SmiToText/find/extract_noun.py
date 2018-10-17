@@ -7,9 +7,11 @@ util = Util()
 
 def expect_noun_text(text):
     word_list = []
-    check_word_end = [ '.', ':', ';', '!', '?', '\"', '\'', '”']
+    check_word_end = ['.', ':', ';', '!', '?', '\"', '\'', '”']
 
-    exclude_char_list = ['[', ']', '\'', '\"', ')', '(', '「', '」', '-', '」', '「', '’', ':', '/', '”', '?', '!', '~', '-', ','
+
+    exclude_char_list = ['[', ']', '\'', '\"', ')', '(', '「', '」', '-', '」', '「', '’', ':', '/', '”', '“', '?', '!',
+                         '~', '-', ',', 'ㆍ', '◇', '△','〃', '〈', '〉','·'
                          ]
     # end_char_exclude_list = [
     #     '잡는', '잡은', '라는', '하는', '르는', '가는', '기는', '에는', '에서는', '보는', '다는', '되는', '또는', '어지', '이냐',
@@ -64,23 +66,6 @@ def expect_noun_text(text):
                              '는', '과', '와']
 
     for word in text.split():
-
-        word = word.replace("]", "")
-        word = word.replace("[", "")
-        word = word.replace("(", "")
-        word = word.replace(")", "")
-        word = word.replace("ㆍ", "")
-        word = word.replace("·", "")
-        word = word.replace("「", "")
-        word = word.replace("」", "")
-        word = word.replace(",", "")
-        word = word.replace(":", "")
-        word = word.replace(";", "")
-        word = word.replace(".", "")
-        word = word.replace("\"", "")
-        word = word.replace("”", "")
-        word = word.replace("“", "")
-        word = word.replace("'", "")
 
         if word.endswith(tuple(check_word_end)):
             word = word[:len(word) - 1]
