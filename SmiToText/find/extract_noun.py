@@ -64,6 +64,24 @@ def expect_noun_text(text):
                              '는', '과', '와']
 
     for word in text.split():
+
+        word = word.replace("]", "\n")
+        word = word.replace("[", "\n")
+        word = word.replace("(", "\n")
+        word = word.replace(")", "\n")
+        word = word.replace("ㆍ", "\n")
+        word = word.replace("·", "\n")
+        word = word.replace("「", "\n")
+        word = word.replace("」", "\n")
+        word = word.replace(",", "\n")
+        word = word.replace(":", "\n")
+        word = word.replace(";", "\n")
+        word = word.replace(".", "\n")
+        word = word.replace("\"", "\n")
+        word = word.replace("”", "\n")
+        word = word.replace("“", "\n")
+        word = word.replace("'", "\n")
+
         if word.endswith(tuple(check_word_end)):
             word = word[:len(word) - 1]
 

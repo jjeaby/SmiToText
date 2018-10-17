@@ -9,6 +9,11 @@ from konlpy.tag import Okt
 
 from SmiToText.tokenizer import mecab
 
+
+''' 
+코모란 꼬꼬마, 트위터를 이용한 명사 추출기
+
+'''
 class extractNoun(object):
 
     def __init__(self):
