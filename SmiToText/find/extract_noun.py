@@ -65,22 +65,22 @@ def expect_noun_text(text):
 
     for word in text.split():
 
-        word = word.replace("]", "\n")
-        word = word.replace("[", "\n")
-        word = word.replace("(", "\n")
-        word = word.replace(")", "\n")
-        word = word.replace("ㆍ", "\n")
-        word = word.replace("·", "\n")
-        word = word.replace("「", "\n")
-        word = word.replace("」", "\n")
-        word = word.replace(",", "\n")
-        word = word.replace(":", "\n")
-        word = word.replace(";", "\n")
-        word = word.replace(".", "\n")
-        word = word.replace("\"", "\n")
-        word = word.replace("”", "\n")
-        word = word.replace("“", "\n")
-        word = word.replace("'", "\n")
+        word = word.replace("]", "")
+        word = word.replace("[", "")
+        word = word.replace("(", "")
+        word = word.replace(")", "")
+        word = word.replace("ㆍ", "")
+        word = word.replace("·", "")
+        word = word.replace("「", "")
+        word = word.replace("」", "")
+        word = word.replace(",", "")
+        word = word.replace(":", "")
+        word = word.replace(";", "")
+        word = word.replace(".", "")
+        word = word.replace("\"", "")
+        word = word.replace("”", "")
+        word = word.replace("“", "")
+        word = word.replace("'", "")
 
         if word.endswith(tuple(check_word_end)):
             word = word[:len(word) - 1]
