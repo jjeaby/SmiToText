@@ -11,7 +11,7 @@ def expect_noun_text(text):
 
 
     exclude_char_list = ['[', ']', '\'', '\"', ')', '(', '「', '」', '-', '」', '「', '’', ':', '/', '”', '“', '?', '!',
-                         '~', '-', ',', 'ㆍ', '◇', '△','〃', '〈', '〉','·'
+                         '~', '-', ',', 'ㆍ', '◇', '△','〃', '〈', '〉','·', '+'
                          ]
     # end_char_exclude_list = [
     #     '잡는', '잡은', '라는', '하는', '르는', '가는', '기는', '에는', '에서는', '보는', '다는', '되는', '또는', '어지', '이냐',
@@ -60,6 +60,7 @@ def expect_noun_text(text):
                              '했', '했기에', '했다', '했을', '했음', '했음을',
                              '다는', '다를', '다와', '다고',
                              '였음', '였음을', '였음과',
+                             '했느냐는', '했느가는','했는냐는', '했는가는', '했는가를',
                              '잡았을', '잡았기', '잡았고', '잡았다', ]
 
     end_char_include_list = ['에게는', '했', '만큼은', '들을', '들은', '들과', '들이', '과는', '으로', '으로는', '을', '를', '은',
@@ -76,7 +77,7 @@ def expect_noun_text(text):
                 for item in end_char_include_list:
                     if word.endswith(item):
                         word = word.replace(item, '')
-                        if len(word) > 3 and len(word) < 20 and not util.is_int(word) and not util.is_alpha(word):
+                        if len(word) > 3 and len(word) < 15 and not util.is_int(word) and not util.is_alpha(word):
                             word_list.append(word)
                             break;
 
