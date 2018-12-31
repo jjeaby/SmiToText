@@ -5,6 +5,13 @@ from nltk.tokenize import sent_tokenize
 from SmiToText.util.util import Util
 from SmiToText.tokenizer import mecab
 
+
+''' 
+Mecab 을 이용한 명사 추출기 
+Pos tagger 이용
+
+'''
+
 util = Util()
 
 
