@@ -110,7 +110,6 @@ def extract_file_noun(input, output):
 
 
 if __name__ == '__main__':
-    print("A")
 
     parser = argparse.ArgumentParser(description="Extract File Noun word")
     parser.add_argument('--input', type=str, required=True, default='', help='Input File')
