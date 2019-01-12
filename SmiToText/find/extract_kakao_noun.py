@@ -1,7 +1,7 @@
 import argparse
 
 from khaiii import KhaiiiApi
-
+import os
 '''
 카카오 한글 형태소 분석기를 이용한 명사 추출기
 
