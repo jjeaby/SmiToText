@@ -9,7 +9,7 @@ from khaiii import KhaiiiApi
 
 
 
-def kakao_postagger_nn_finder(self, summay_text):
+def kakao_postagger_nn_finder( summay_text):
     api = KhaiiiApi()
     api.open()
     nn_word_list = []
@@ -32,7 +32,7 @@ def kakao_postagger_nn_finder(self, summay_text):
     return nn_word_list
 
 
-def extract_file_noun(self, input, output):
+def extract_file_noun(input, output):
     input_file = open(input, mode='r', encoding='utf-8')
     open(output, mode='w', encoding='utf-8')
     output_file = open(output, mode='a', encoding='utf-8')
@@ -43,7 +43,7 @@ def extract_file_noun(self, input, output):
             break;
 
         line = line.strip()
-        word_list = self.kakao_postagger_nn_finder(line)
+        word_list = kakao_postagger_nn_finder(line)
 
         if len(word_list):
             print(line_number, word_list)
