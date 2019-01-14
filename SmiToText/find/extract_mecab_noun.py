@@ -122,7 +122,7 @@ def extract_file_noun(input, output):
                             output_file.write(word + os.linesep)
                             sentence_words.append(word)
                             # print(line_number, word)
-        print(sentence_words)
+        print(line_number, sentence_words)
         line_number += 1
 
 if __name__ == '__main__':
