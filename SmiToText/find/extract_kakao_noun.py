@@ -52,8 +52,13 @@ def extract_file_noun(input, output):
         line = remove_naver_news(line)
         line = util.normalize(line)
 
+
+
+
         for line_array in line.split("\n"):
             sentences = nltkSentTokenizer(line_array)
+
+            sentence_words = []
             for sent in sentences:
 
                 word_list = kakao_postagger_nn_finder(sent)
@@ -64,9 +69,12 @@ def extract_file_noun(input, output):
                             continue
                         else:
                             output_file.write(word + os.linesep)
-                            print(line_number, word)
-
+                            sentence_words.append(word)
+                            # print(line_number, word)
+        print(sentence_words)
         line_number += 1
+
+
 
 
 def remove_naver_news(text):

@@ -115,6 +115,8 @@ def extract_file_noun(input, output):
 
         for line_array in line.split("\n"):
             sentences = nltkSentTokenizer(line_array)
+
+            sentence_words = []
             for sent in sentences:
 
                 word_list = expect_nng_text(sent)
@@ -125,9 +127,11 @@ def extract_file_noun(input, output):
                             continue
                         else:
                             output_file.write(word + os.linesep)
-                            print(line_number, word)
-
+                            sentence_words.append(word)
+                            # print(line_number, word)
+        print(sentence_words)
         line_number += 1
+
 
 
 
