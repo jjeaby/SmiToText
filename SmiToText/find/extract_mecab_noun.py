@@ -92,6 +92,7 @@ def expect_noun_text(text):
 
 
 
+
 def extract_file_noun(input, output):
     input_file = open(input, mode='r', encoding='utf-8')
     open(output, mode='w', encoding='utf-8')
@@ -104,19 +105,21 @@ def extract_file_noun(input, output):
 
         line = line.strip()
 
-        sentences = nltkSentTokenizer(line)
+        for line_array in line.split("\n"):
+            sentences = nltkSentTokenizer(line_array)
+            for sent in sentences:
 
-        for sent in sentences:
+                word_list = expect_noun_text(sent)
 
-            word_list = expect_noun_text(sent)
-
-            if len(word_list):
-                print(line_number, word_list)
-                for word in word_list:
-                    output_file.write(word + os.linesep)
+                if len(word_list):
+                    for word in word_list:
+                        if util.check_email(word) or util.is_int(word) or util.is_alpha(word):
+                            continue
+                        else:
+                            output_file.write(word + os.linesep)
+                            print(line_number, word)
 
         line_number += 1
-
 
 if __name__ == '__main__':
 

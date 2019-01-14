@@ -1,17 +1,21 @@
 import argparse
+import re
 
 from khaiii import KhaiiiApi
 import os
+from SmiToText.util.util import Util
 
 from SmiToText.tokenizer.nltk import nltkSentTokenizer
+
 '''
 카카오 한글 형태소 분석기를 이용한 명사 추출기
 
 '''
 
+util = Util()
 
 
-def kakao_postagger_nn_finder( summay_text):
+def kakao_postagger_nn_finder(summay_text):
     api = KhaiiiApi()
     api.open()
     nn_word_list = []
@@ -45,22 +49,39 @@ def extract_file_noun(input, output):
             break;
 
         line = line.strip()
+        line = remove_naver_news(line)
+        line = util.normalize(line)
 
-        sentences = nltkSentTokenizer(line)
+        for line_array in line.split("\n"):
+            sentences = nltkSentTokenizer(line_array)
+            for sent in sentences:
 
-        for sent in sentences:
+                word_list = kakao_postagger_nn_finder(sent)
 
-            word_list = kakao_postagger_nn_finder(sent)
-
-            if len(word_list):
-                print(line_number, word_list)
-                for word in word_list:
-                    output_file.write(word + os.linesep)
+                if len(word_list):
+                    for word in word_list:
+                        if util.check_email(word) or util.is_int(word) or util.is_alpha(word):
+                            continue
+                        else:
+                            output_file.write(word + os.linesep)
+                            print(line_number, word)
 
         line_number += 1
 
 
+def remove_naver_news(text):
+    # def sub(pattern, repl, string, count=0, flags=0):
+
+    text = re.sub(u'function _flash_removeCallback\(\) \{\}', '다. ', text)
+    text = re.sub(u'flash 오류를 우회하기 위한 함수 추가', '다. ', text)
+    text = re.sub(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", ' ', text)
+    text = re.sub(r'다\.', '다. ', text)
+    text = re.sub(r'다\.', '다. ', text)
+    return text
+
+
 if __name__ == '__main__':
+
     parser = argparse.ArgumentParser(description="Extract File Noun word")
     parser.add_argument('--input', type=str, required=True, default='', help='Input File')
     parser.add_argument('--output', type=str, required=True, default='', help='Output File')
@@ -78,4 +99,3 @@ if __name__ == '__main__':
     output = str(args.output)
 
     extract_file_noun(input, output)
-

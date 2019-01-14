@@ -2,6 +2,7 @@ import argparse
 import os
 from nltk.tokenize import sent_tokenize
 
+from SmiToText.tokenizer.nltk import nltkSentTokenizer
 from SmiToText.util.util import Util
 from SmiToText.tokenizer import mecab
 
@@ -15,7 +16,7 @@ Pos tagger 이용
 util = Util()
 
 
-def expect_noun_text(text):
+def expect_nng_text(text):
     nng_list = []
     vv_list = []
 
@@ -111,14 +112,23 @@ def extract_file_noun(input, output):
             break;
 
         line = line.strip()
-        word_list = expect_noun_text(line)
 
-        if len(word_list):
-            print(line_number, word_list)
-            for word in word_list:
-                output_file.write(word + os.linesep)
+        for line_array in line.split("\n"):
+            sentences = nltkSentTokenizer(line_array)
+            for sent in sentences:
+
+                word_list = expect_nng_text(sent)
+
+                if len(word_list):
+                    for word in word_list:
+                        if util.check_email(word) or util.is_int(word) or util.is_alpha(word):
+                            continue
+                        else:
+                            output_file.write(word + os.linesep)
+                            print(line_number, word)
 
         line_number += 1
+
 
 
 if __name__ == '__main__':
