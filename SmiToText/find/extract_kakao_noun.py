@@ -2,6 +2,8 @@ import argparse
 
 from khaiii import KhaiiiApi
 import os
+
+from SmiToText.tokenizer.nltk import nltkSentTokenizer
 '''
 카카오 한글 형태소 분석기를 이용한 명사 추출기
 
@@ -43,12 +45,18 @@ def extract_file_noun(input, output):
             break;
 
         line = line.strip()
-        word_list = kakao_postagger_nn_finder(line)
 
-        if len(word_list):
-            print(line_number, word_list)
-            for word in word_list:
-                output_file.write(word + os.linesep)
+        sentences = nltkSentTokenizer(line)
+
+        for sent in sentences:
+
+            word_list = kakao_postagger_nn_finder(sent)
+
+            if len(word_list):
+                print(line_number, word_list)
+                for word in word_list:
+                    output_file.write(word + os.linesep)
+
         line_number += 1
 
 

@@ -1,4 +1,6 @@
 import argparse
+
+from SmiToText.tokenizer.nltk import nltkSentTokenizer
 from SmiToText.util.util import Util
 import os
 
@@ -89,6 +91,7 @@ def expect_noun_text(text):
     return word_list
 
 
+
 def extract_file_noun(input, output):
     input_file = open(input, mode='r', encoding='utf-8')
     open(output, mode='w', encoding='utf-8')
@@ -100,12 +103,18 @@ def extract_file_noun(input, output):
             break;
 
         line = line.strip()
-        word_list = expect_noun_text(line)
 
-        if len(word_list):
-            print(line_number, word_list)
-            for word in word_list:
-                output_file.write(word + os.linesep)
+        sentences = nltkSentTokenizer(line)
+
+        for sent in sentences:
+
+            word_list = expect_noun_text(sent)
+
+            if len(word_list):
+                print(line_number, word_list)
+                for word in word_list:
+                    output_file.write(word + os.linesep)
+
         line_number += 1
 
 
