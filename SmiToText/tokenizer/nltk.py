@@ -2,8 +2,11 @@ from jpype import unicode
 from nltk.tokenize import word_tokenize
 import nltk.data
 
-from nltk.tokenize import sent_tokenize
 
+from nltk.tokenize import sent_tokenize, word_tokenize
+
+def nltkSentTokenizer(sentence, DEBUG=False):
+    return sent_tokenize(sentence)
 
 
 def nltkTokenizer(sentence, DEBUG=False):
