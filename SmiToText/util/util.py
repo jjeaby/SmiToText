@@ -1,10 +1,11 @@
 import os
 import errno
+import re
 import sys
 
 import pkg_resources
 import numpy as np
-
+from krwordrank.hangle import normalize
 
 
 
@@ -38,6 +39,21 @@ class Util(object):
     def rreplace(self, s, old, new, occurrence):
         li = s.rsplit(old, occurrence)
         return new.join(li)
+
+    def check_email(self, text):
+        match = re.search(r'[\w.-]+@[\w.-]+.\w+', text)
+
+        if match:
+            return True
+        else:
+            return False
+
+
+
+    def normalize(self,text):
+        text = normalize(text, english=True, number=True, punctuation=True)
+        return text
+
 
     def is_int(self, value):
         # print(value)
