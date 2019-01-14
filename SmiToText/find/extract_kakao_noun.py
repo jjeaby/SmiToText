@@ -80,11 +80,10 @@ def extract_file_noun(input, output):
 def remove_naver_news(text):
     # def sub(pattern, repl, string, count=0, flags=0):
 
-    text = re.sub(u'function _flash_removeCallback\(\) \{\}', '다. ', text)
-    text = re.sub(u'flash 오류를 우회하기 위한 함수 추가', '다. ', text)
+    text = re.sub(u'function _flash_removeCallback() {}', ' ', text)
+    text = re.sub(u'// flash 오류를 우회하기 위한 함수 추가', ' ', text)
     text = re.sub(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", ' ', text)
-    text = re.sub(r'다\.', '다. ', text)
-    text = re.sub(r'다\.', '다. ', text)
+    text = re.sub(r'다\.', '다\. ', text)
     return text
 
 
