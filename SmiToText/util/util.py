@@ -83,9 +83,13 @@ class Util(object):
 
     def remove_naver_news(self, text):
         # def sub(pattern, repl, string, count=0, flags=0):
-
-        text = re.sub(r'function _flash_removeCallback() {}', ' ', text)
-        text = re.sub(r'// flash 오류를 우회하기 위한 함수 추가', ' ', text)
+        text = re.sub(r'function _flash_removeCallback\(\) \{\}', ' ', text)
+        text = re.sub(r'\/\/ flash 오류를 우회하기 위한 함수 추가', ' ', text)
         text = re.sub(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", ' ', text)
         text = re.sub(r'다\.', '다\. ', text)
         return text
+
+
+if __name__ == '__main__':
+    util = Util()
+    print(util. remove_naver_news("asdf"))
