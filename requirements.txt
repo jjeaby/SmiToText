@@ -10,3 +10,4 @@ scikit-learn
 python-crfsuite
 tensorflow-gpu
 caret
+krwordrank
