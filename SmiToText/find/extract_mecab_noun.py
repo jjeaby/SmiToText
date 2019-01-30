@@ -12,7 +12,7 @@ def expect_noun_text(text):
     check_word_end = ['.', ':', ';', '!', '?', '\"', '\'', '”']
 
     exclude_char_list = ['[', ']', '\'', '\"', ')', '(', '「', '」', '-', '」', '「', '’', ':', '/', '”', '“', '?', '!',
-                         '~', '-', ',', 'ㆍ', '◇', '△', '〃', '〈', '〉', '·', '+', '▲', '○', '【','…',
+                         '~', '-', ',', 'ㆍ', '◇', '△', '〃', '〈', '〉', '·', '+', '▲', '○', '【', '…',
                          ]
     # end_char_exclude_list = [
     #     '잡는', '잡은', '라는', '하는', '르는', '가는', '기는', '에는', '에서는', '보는', '다는', '되는', '또는', '어지', '이냐',
@@ -68,7 +68,7 @@ def expect_noun_text(text):
                              '해보는', '해보기', '해보기를', '해보기는', '로는', '와는', '지기는', '지기를', '지기도',
                              '하느냐는', '하느냐', '하기를', '하기는', '들이는', '들이기', '들이다', '한가를', '한가는',
                              '시키기를', '라고는', '라고', '와는', '제외하고는', '할까는',
-                             '시키자는', '시키자를', '되기를', '되기는',]
+                             '시키자는', '시키자를', '되기를', '되기는', ]
 
     end_char_include_list = ['에게는', '했', '만큼은', '들을', '들은', '들과', '들이', '과는', '으로', '으로는', '을', '를', '은',
                              '는', '과', '와', '로']
@@ -91,8 +91,6 @@ def expect_noun_text(text):
     return word_list
 
 
-
-
 def extract_file_noun(input, output):
     input_file = open(input, mode='r', encoding='utf-8')
     open(output, mode='w', encoding='utf-8')
@@ -104,7 +102,6 @@ def extract_file_noun(input, output):
             break;
 
         line = line.strip()
-
 
         for line_array in line.split("\n"):
             sentences = nltkSentTokenizer(line_array)
@@ -119,11 +116,14 @@ def extract_file_noun(input, output):
                         if util.check_email(word) or util.is_int(word) or util.is_alpha(word):
                             continue
                         else:
-                            output_file.write(word + os.linesep)
-                            sentence_words.append(word)
+                            if word not in ["`", ",", "'", "\"", "|", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")",
+                                            "-", "_", "=", "+", "<", ">", ".", ";", ":"]:
+                                output_file.write(word + os.linesep)
+                                sentence_words.append(word)
                             # print(line_number, word)
         print(line_number, sentence_words)
         line_number += 1
+
 
 if __name__ == '__main__':
 
