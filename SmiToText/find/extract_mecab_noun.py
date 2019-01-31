@@ -1,8 +1,9 @@
 import argparse
 
+import os
+
 from SmiToText.tokenizer.nltk import nltkSentTokenizer
 from SmiToText.util.util import Util
-import os
 
 util = Util()
 
@@ -116,8 +117,16 @@ def extract_file_noun(input, output):
                         if util.check_email(word) or util.is_int(word) or util.is_alpha(word):
                             continue
                         else:
-                            if word not in ["`", ",", "'", "\"", "|", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")",
-                                            "-", "_", "=", "+", "<", ">", ".", ";", ":"]:
+                            add_flag = True
+                            for char in word:
+                                if char in ["‘", "`", ",", "'", "\"", "|", "!", "@", "#", "$", "%", "^", "&", "*", "(",
+                                            ")",
+                                            "-", "_", "=", "+", "<", ">", ".", ";", ":",
+                                            "ㄱ", "ㄲ", "ㅂ", "ㅃ", "ㅈ", "ㅉ", "ㄷ", "ㄸ", "ㄱ", "ㅁ", "ㅇ", "ㄹ", "ㅎ", "ㅅ", "ㅆ",
+                                            "ㅍ", "ㅊ", "ㅌ", "ㅋ", "ㅛ", "ㅕ", "ㅑ", "ㅐ", "ㅔ", "ㅗ", "ㅓ", "ㅏ", "ㅣ", "ㅠ", "ㅜ",
+                                            "ㅡ"]:
+                                    add_flag = False
+                            if add_flag:
                                 output_file.write(word + os.linesep)
                                 sentence_words.append(word)
                             # print(line_number, word)
