@@ -11,3 +11,4 @@ python-crfsuite
 tensorflow-gpu
 caret
 krwordrank
+wordcloud
