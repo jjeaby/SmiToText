@@ -1,5 +1,6 @@
 import argparse
 import os
+from collections import Counter
 
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
@@ -52,5 +53,12 @@ if __name__ == '__main__':
     input = str(args.input)
     output = str(args.output)
 
-    countText = mecab_word_tags(input)
+    countText = Counter()
+    with open(input, encoding='utf-8', mode='r') as input_file:
+        lines = input_file.readlines()
+        tempCountText = Counter()
+        for line in lines:
+            tempCountText = mecab_word_tags(line)
+            countText = countText + tempCountText
+
     wordcloud_gen(countText, output)
