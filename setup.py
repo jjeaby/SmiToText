@@ -24,7 +24,7 @@ install_requires = [
 ]
 setup(
     name='SmiToText',
-    version='0.1410',
+    version='0.1411',
     py_modules = ['SmiToText'],
     packages=find_packages(exclude=['tests']),
     install_requires=install_requires,
@@ -33,7 +33,9 @@ setup(
     license='Apache 2.0',
     author='Lee Yong Jin',
     author_email='jjeaby@gmail.com',
+    description="test processing",
     long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
     zip_safe=False,
     classifiers      = [
         'Programming Language :: Python :: 3',

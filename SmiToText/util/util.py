@@ -113,6 +113,9 @@ class Util(object):
         return text
 
 
+
+
 if __name__ == '__main__':
     util = Util()
     print(util. remove_naver_news("asdf"))
+    print(util.getRootPath("SmiToText"))

@@ -12,3 +12,4 @@ tensorflow-gpu
 caret
 krwordrank
 wordcloud
+matplotlib

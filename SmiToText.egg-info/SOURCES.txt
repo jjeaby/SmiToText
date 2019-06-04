@@ -34,3 +34,5 @@ SmiToText/util/util.py
 SmiToText/wordcheck/__init__.py
 SmiToText/wordcheck/koLastCharCheck.py
 SmiToText/wordcheck/koNounExtract.py
+SmiToText/wordcloud/__init__.py
+SmiToText/wordcloud/cloudimage.py
