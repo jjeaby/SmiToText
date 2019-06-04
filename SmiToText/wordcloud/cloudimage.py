@@ -8,11 +8,9 @@ from wordcloud import WordCloud
 from SmiToText.frequency.word import mecab_word_tags
 from SmiToText.util.util import Util
 
-default_font_path = Util().getRootPath(
-    "SmiToText") + os.sep + 'data' + os.sep + 'font' + os.sep + 'NanumBarunGothic.ttf'
 
 
-def wordcloud_gen(keywords, save_path, width=800, height=800, font_path=default_font_path):
+def wordcloud_gen(keywords, save_path, width=800, height=800, font_path=''):
     wordcloud = WordCloud(
         font_path=font_path,
         width=width,
@@ -37,10 +35,13 @@ def wordcloud_gen(keywords, save_path, width=800, height=800, font_path=default_
 if __name__ == '__main__':
     texts = '이것 은 예문 입니다. 여러분 의 문장을 넣 으세요'
     # keywords = {'이것': 5, '예문': 3, '단어': 5, '빈도수': 3}
+    default_font_path = Util().getRootPath(
+        "SmiToText") + os.sep + 'data' + os.sep + 'font' + os.sep + 'NanumBarunGothic.ttf'
 
     parser = argparse.ArgumentParser(description="Word Cloud Generator")
     parser.add_argument('--input', type=str, required=True, default='', help='Input File')
     parser.add_argument('--output', type=str, required=True, default='', help='Word Cloud Image File')
+    parser.add_argument('--font', type=str, required=False, default='', help='Word Cloud Font File')
 
     args = parser.parse_args()
     if not args.input:
@@ -50,8 +51,13 @@ if __name__ == '__main__':
     if not args.output:
         print("Word Cloud Image File!")
         exit(1)
+
     input = str(args.input)
     output = str(args.output)
+    font = str(args.font)
+
+    if not font :
+        font = default_font_path
 
     countText = Counter()
     with open(input, encoding='utf-8', mode='r') as input_file:
@@ -61,4 +67,4 @@ if __name__ == '__main__':
             tempCountText = mecab_word_tags(line)
             countText = countText + tempCountText
 
-    wordcloud_gen(countText, output)
+    wordcloud_gen(countText, output,font_path=font)
