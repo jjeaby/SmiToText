@@ -2,7 +2,11 @@ import argparse
 import os
 from collections import Counter
 
+import matplotlib as mpl
+mpl.use('Agg')
+
 import matplotlib.pyplot as plt
+
 from wordcloud import WordCloud
 
 from SmiToText.frequency.word import mecab_word_tags
@@ -24,7 +28,9 @@ def wordcloud_gen(keywords, save_path, width=800, height=800, font_path=''):
 
     array = wordcloud.to_array()
 
+
     fig = plt.figure(figsize=(10, 10))
+
     plt.imshow(array, interpolation="bilinear")
     plt.axis("off")
 
