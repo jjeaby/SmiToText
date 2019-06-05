@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 from wordcloud import WordCloud
 
-from SmiToText.frequency.word import mecab_word_tags
+from SmiToText.frequency.word import nltk_word_tags
 from SmiToText.util.util import Util
 
 
@@ -70,7 +70,7 @@ if __name__ == '__main__':
         lines = input_file.readlines()
         tempCountText = Counter()
         for line in lines:
-            tempCountText = mecab_word_tags(line)
+            tempCountText = nltk_word_tags(line)
             countText = countText + tempCountText
 
     wordcloud_gen(countText, output,font_path=font)
