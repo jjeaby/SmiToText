@@ -3,36 +3,52 @@ import os
 from collections import Counter
 
 import matplotlib as mpl
+
 mpl.use('Agg')
 
 import matplotlib.pyplot as plt
+import numpy as np
+from PIL import Image
 
 from wordcloud import WordCloud
 
 from SmiToText.frequency.word import nltk_word_tags
+from SmiToText.frequency.word import mecab_word_tags
 from SmiToText.util.util import Util
 
 
-
-def wordcloud_gen(keywords, save_path, width=800, height=800, font_path=''):
-    wordcloud = WordCloud(
-        font_path=font_path,
-        width=width,
-        height=height,
-        background_color="white",
-        prefer_horizontal=0.9999,  # horizontal preference
-        min_font_size=10  # min font size
-
-    )
+def wordcloud_gen(keywords, save_path, width=1000, height=1000, font_path='', image=''):
+    if image != '' :
+        mask = np.array(Image.open(image))
+        wordcloud = WordCloud(
+            margin=1,
+            font_path=font_path,
+            width=width,
+            height=height,
+            background_color="white",
+            # prefer_horizontal=0.9999,  # horizontal preference
+            # min_font_size=5,  # min font size
+            # max_font_size=40,
+            mask=mask
+        )
+    else :
+        wordcloud = WordCloud(
+            margin=1,
+            font_path=font_path,
+            width=width,
+            height=height,
+            background_color="white",
+            # prefer_horizontal=0.9999,  # horizontal preference
+            # min_font_size=5,  # min font size
+            # max_font_size=40,
+            # mask=mask
+        )
     wordcloud = wordcloud.generate_from_frequencies(keywords)
+    fig = plt.figure(figsize=(8, 8), dpi=300)
 
-    array = wordcloud.to_array()
-
-
-    fig = plt.figure(figsize=(10, 10))
-
-    plt.imshow(array, interpolation="bilinear")
+    plt.imshow(wordcloud, interpolation="bilinear")
     plt.axis("off")
+    plt.tight_layout()
 
     # plt.show()
     fig.savefig(save_path)
@@ -48,6 +64,8 @@ if __name__ == '__main__':
     parser.add_argument('--input', type=str, required=True, default='', help='Input File')
     parser.add_argument('--output', type=str, required=True, default='', help='Word Cloud Image File')
     parser.add_argument('--font', type=str, required=False, default='', help='Word Cloud Font File')
+    parser.add_argument('--lang', type=str, required=False, default='en', help='Lang Check( en, ko ), defalut en')
+    parser.add_argument('--image', type=str, required=False, default='', help='Shape Image File')
 
     args = parser.parse_args()
     if not args.input:
@@ -61,8 +79,10 @@ if __name__ == '__main__':
     input = str(args.input)
     output = str(args.output)
     font = str(args.font)
+    lang = str(args.lang)
+    image = str(args.image)
 
-    if not font :
+    if not font:
         font = default_font_path
 
     countText = Counter()
@@ -70,7 +90,10 @@ if __name__ == '__main__':
         lines = input_file.readlines()
         tempCountText = Counter()
         for line in lines:
-            tempCountText = nltk_word_tags(line)
+            if lang.lower() == 'en':
+                tempCountText = nltk_word_tags(line)
+            elif lang.lower() == 'ko':
+                tempCountText = mecab_word_tags(line)
             countText = countText + tempCountText
 
-    wordcloud_gen(countText, output,font_path=font)
+    wordcloud_gen(countText, output, font_path=font, image=image)
