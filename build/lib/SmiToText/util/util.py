@@ -112,7 +112,14 @@ class Util(object):
         text = re.sub(r'다\.', '다. ', text)
         return text
 
+    def remove_http_tag(self, text):
+        clean = re.compile('<.*?>')
+        text = re.sub(clean, '', text)
+        text = re.sub('http://\S+|https://\S+', '', text)
+        return text
+
 
 if __name__ == '__main__':
     util = Util()
     print(util. remove_naver_news("asdf"))
+    print(util.getRootPath("SmiToText"))

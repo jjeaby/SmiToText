@@ -1,8 +1,9 @@
 import argparse
 
+import os
+
 from SmiToText.tokenizer.nltk import nltkSentTokenizer
 from SmiToText.util.util import Util
-import os
 
 util = Util()
 
@@ -12,7 +13,7 @@ def expect_noun_text(text):
     check_word_end = ['.', ':', ';', '!', '?', '\"', '\'', '”']
 
     exclude_char_list = ['[', ']', '\'', '\"', ')', '(', '「', '」', '-', '」', '「', '’', ':', '/', '”', '“', '?', '!',
-                         '~', '-', ',', 'ㆍ', '◇', '△', '〃', '〈', '〉', '·', '+', '▲', '○', '【','…',
+                         '~', '-', ',', 'ㆍ', '◇', '△', '〃', '〈', '〉', '·', '+', '▲', '○', '【', '…',
                          ]
     # end_char_exclude_list = [
     #     '잡는', '잡은', '라는', '하는', '르는', '가는', '기는', '에는', '에서는', '보는', '다는', '되는', '또는', '어지', '이냐',
@@ -37,13 +38,18 @@ def expect_noun_text(text):
     #     '흘러나오는', '흘러나오기', '흘러나오다', '흘러나오기에', '흘러나오',
     #     '하려는', '하려고',
     # ]
-    end_char_exclude_list = ['가', '가는', '기는', '까지는', '까지를', '까지와', '나오는', '나오다', '내고는', '내기', '내는', '넘기', '넘는',
+    end_char_exclude_list = ['가', '가는', '기는', '그리고서', '그랬을까',
+                             '까지는', '까지를', '까지와',
+                             '그리고서',
+                             '나오는', '나오다', '내고는', '내기', '내는', '넘기', '넘는',
                              '넘다', '넘을',
                              '되는', '되었', '되었기', '되었다', '되었을', '드는', '들', '들리고', '들리는', '들리다에', '들어지',
                              '때로는', '또는', '뛰어드',
                              '뛰어드는', '라는', '랬냐고', '랬냐는', '려고', '려는', '르는', '리고', '리는', '리는데',
                              '리다', '리려', '리려는', '만은', '만을',
-                             '만이', '만큼', '말까', '받고', '보이기', '보이는', '보이다', '본격적', '봤',
+                             '만이', '만큼', '말까',
+                             '받고', '보이기', '보이는', '보이다', '본격적', '봤',
+                             '보거말고',
                              '쉬움', '시키고', '시키는', '시키다', '시키러',
                              '아치고', '아치는', '아치다', '어지', '어지는', '에는', '에도', '에와', '에서는', '에서를', '에서도',
                              '오기', '오기만',
@@ -68,11 +74,16 @@ def expect_noun_text(text):
                              '해보는', '해보기', '해보기를', '해보기는', '로는', '와는', '지기는', '지기를', '지기도',
                              '하느냐는', '하느냐', '하기를', '하기는', '들이는', '들이기', '들이다', '한가를', '한가는',
                              '시키기를', '라고는', '라고', '와는', '제외하고는', '할까는',
-                             '시키자는', '시키자를', '되기를', '되기는',]
+                             '시키자는', '시키자를', '되기를', '되기는', ]
 
-    end_char_include_list = ['에게는', '했', '만큼은', '들을', '들은', '들과', '들이', '과는', '으로', '으로는', '을', '를', '은',
+    end_char_include_list = ['에게는',
+                             '했',
+                             '만큼은', '들을', '들은', '들과', '들이', '과는', '으로', '으로는', '을', '를', '은',
                              '는', '과', '와', '로']
 
+    end_char_replace_list = [ '는것',
+                              '에서', '이냐', '이상',
+                              '하기', '할때', '하시', '해놓',  ]
     for word in text.split():
 
         if word.endswith(tuple(check_word_end)):
@@ -85,12 +96,14 @@ def expect_noun_text(text):
                     if word.endswith(item):
                         word = word.replace(item, '')
                         if len(word) > 3 and len(word) < 15 and not util.is_int(word) and not util.is_alpha(word):
+                            for remove_item in end_char_replace_list:
+                                if word.endswith(remove_item) :
+                                    word = util.rreplace(word, remove_item, '', 1)
+
                             word_list.append(word)
                             break;
 
     return word_list
-
-
 
 
 def extract_file_noun(input, output):
@@ -105,7 +118,6 @@ def extract_file_noun(input, output):
 
         line = line.strip()
 
-
         for line_array in line.split("\n"):
             sentences = nltkSentTokenizer(line_array)
 
@@ -119,11 +131,22 @@ def extract_file_noun(input, output):
                         if util.check_email(word) or util.is_int(word) or util.is_alpha(word):
                             continue
                         else:
-                            output_file.write(word + os.linesep)
-                            sentence_words.append(word)
+                            add_flag = True
+                            for char in word:
+                                if char in ["‘", "`", ",", "'", "\"", "|", "!", "@", "#", "$", "%", "^", "&", "*", "(",
+                                            ")",
+                                            "-", "_", "=", "+", "<", ">", ".", ";", ":",
+                                            "ㄱ", "ㄴ", "ㄲ", "ㅂ", "ㅃ", "ㅈ", "ㅉ", "ㄷ", "ㄸ", "ㄱ", "ㅁ", "ㅇ", "ㄹ", "ㅎ", "ㅅ", "ㅆ",
+                                            "ㅍ", "ㅊ", "ㅌ", "ㅋ", "ㅛ", "ㅕ", "ㅑ", "ㅐ", "ㅔ", "ㅗ", "ㅓ", "ㅏ", "ㅣ", "ㅠ", "ㅜ",
+                                            "ㅡ"]:
+                                    add_flag = False
+                            if add_flag:
+                                output_file.write(word + os.linesep)
+                                sentence_words.append(word)
                             # print(line_number, word)
         print(line_number, sentence_words)
         line_number += 1
+
 
 if __name__ == '__main__':
 
@@ -144,3 +167,4 @@ if __name__ == '__main__':
     output = str(args.output)
 
     extract_file_noun(input, output)
+

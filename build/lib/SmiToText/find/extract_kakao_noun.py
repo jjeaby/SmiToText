@@ -1,10 +1,11 @@
 import argparse
+import time
 
-from khaiii import KhaiiiApi
 import os
-from SmiToText.util.util import Util
+from khaiii import KhaiiiApi
 
 from SmiToText.tokenizer.nltk import nltkSentTokenizer
+from SmiToText.util.util import Util
 
 '''
 카카오 한글 형태소 분석기를 이용한 명사 추출기
@@ -37,41 +38,42 @@ def kakao_postagger_nn_finder(summay_text):
     return nn_word_list
 
 
-def extract_file_noun(input, output):
-    input_file = open(input, mode='r', encoding='utf-8')
+def extract_file_noun(input, output, time_interval=0):
     open(output, mode='w', encoding='utf-8')
     output_file = open(output, mode='a', encoding='utf-8')
     line_number = 1
-    while (True):
-        line = input_file.readline()
-        if not line:
-            break;
+    with open(input, mode='r', encoding='utf-8') as input_file:
+        lines = input_file.readlines()
+        for line in lines:
+            line = line.strip()
+            line = util.remove_naver_news(line)
+            line = util.remove_http_tag(line)
+            line = util.normalize(line)
 
-        line = line.strip()
-        line = util.remove_naver_news(line)
-        line = util.normalize(line)
+            for line_array in line.split("\n"):
+                sentences = nltkSentTokenizer(line_array)
 
+                sentence_words = []
+                for sent in sentences:
 
+                    word_list = kakao_postagger_nn_finder(sent)
 
+                    if len(word_list):
+                        for word in word_list:
+                            if util.check_email(word) or util.is_int(word) or util.is_alpha(word):
+                                continue
+                            else:
+                                if word.startswith(".") or word.startswith(",") or word.startswith("!") or word.startswith("?") :
+                                    word = word[1:]
+                                if word.endswith(".") or word.endswith(",") or word.endswith("!") or word.endswith("?") :
+                                    word = word[:-1]
 
-        for line_array in line.split("\n"):
-            sentences = nltkSentTokenizer(line_array)
-
-            sentence_words = []
-            for sent in sentences:
-
-                word_list = kakao_postagger_nn_finder(sent)
-
-                if len(word_list):
-                    for word in word_list:
-                        if util.check_email(word) or util.is_int(word) or util.is_alpha(word):
-                            continue
-                        else:
-                            output_file.write(word + os.linesep)
-                            sentence_words.append(word)
-                            # print(line_number, word)
-        print(line_number, sentence_words)
-        line_number += 1
+                                output_file.write(word + os.linesep)
+                                sentence_words.append(word)
+                                # print(line_number, word)
+            time.sleep(time_interval)
+            print(line_number, sentence_words)
+            line_number += 1
 
 
 if __name__ == '__main__':
@@ -79,6 +81,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Extract File Noun word")
     parser.add_argument('--input', type=str, required=True, default='', help='Input File')
     parser.add_argument('--output', type=str, required=True, default='', help='Output File')
+    parser.add_argument('--interval', type=str, required=False, default='0', help='Time Interval')
     args = parser.parse_args()
 
     if not args.input:
@@ -91,5 +94,6 @@ if __name__ == '__main__':
 
     input = str(args.input)
     output = str(args.output)
+    time_interval = float(args.interval)
 
-    extract_file_noun(input, output)
+    extract_file_noun(input, output, time_interval)

@@ -47,6 +47,7 @@ def extract_file_noun(input, output, time_interval=0):
         for line in lines:
             line = line.strip()
             line = util.remove_naver_news(line)
+            line = util.remove_http_tag(line)
             line = util.normalize(line)
 
             for line_array in line.split("\n"):
@@ -62,6 +63,11 @@ def extract_file_noun(input, output, time_interval=0):
                             if util.check_email(word) or util.is_int(word) or util.is_alpha(word):
                                 continue
                             else:
+                                if word.startswith(".") or word.startswith(",") or word.startswith("!") or word.startswith("?") :
+                                    word = word[1:]
+                                if word.endswith(".") or word.endswith(",") or word.endswith("!") or word.endswith("?") :
+                                    word = word[:-1]
+
                                 output_file.write(word + os.linesep)
                                 sentence_words.append(word)
                                 # print(line_number, word)
