@@ -13,10 +13,10 @@ from SmiToText.util.util import Util
 '''
 
 util = Util()
+api = KhaiiiApi()
 
 
 def kakao_postagger_nn_finder(summay_text):
-    api = KhaiiiApi()
     api.open()
     nn_word_list = []
     for word in api.analyze(summay_text):
@@ -34,7 +34,7 @@ def kakao_postagger_nn_finder(summay_text):
         if len(complex_morphs) > 1:
             # print("->", complex_morphs)
             nn_word_list.append(complex_morphs)
-
+    api.close()
     return nn_word_list
 
 
