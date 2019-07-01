@@ -22,9 +22,9 @@ def kakao_postagger_nn_finder(summay_text):
     nn_word_list = []
     for word in api.analyze(summay_text):
         morphs_str = ' + '.join([(m.lex + '/' + m.tag) for m in word.morphs])
-        print('-- kakao_postagger --')
-        print(f'{word.lex}\t{morphs_str}')
-        print('-- kakao_postagger --')
+        # print('-- kakao_postagger --')
+        # print(f'{word.lex}\t{morphs_str}')
+        # print('-- kakao_postagger --')
 
         morphs_str_list = morphs_str.split(" + ")
 
@@ -74,9 +74,9 @@ def extract_file_noun(input, output, time_interval=0):
                     sent = sent.replace('  ', ' ')
                     if len(sent.strip()) == 0:
                         continue
-                    print('sent:', sent)
+                    # print('sent:', sent)
                     word_list = kakao_postagger_nn_finder(sent)
-                    print('word_list:', word_list)
+                    # print('word_list:', word_list)
                     # eng_word_list = re.findall('[A-Za-z]+', sent)
                     # print('eng_word:', eng_word_list)
                     # word_list = word_list + eng_word_list
@@ -100,10 +100,10 @@ def extract_file_noun(input, output, time_interval=0):
                                                   'ㅋ', 'ㅌ', 'ㅊ', 'ㅍ', 'ㅠ', 'ㅜ', 'ㅡ']
                                 matching = [s for s in one_korea_char if s in word]
                                 if len(matching) > 0:
-                                    print("-" * 100)
-                                    print(len(matching))
-                                    print(matching)
-                                    print("-" * 100)
+                                    # print("-" * 100)
+                                    # print(len(matching))
+                                    # print(matching)
+                                    # print("-" * 100)
                                     continue
 
                                 if str(sent).find(word) < 0:
