@@ -13,3 +13,4 @@ caret
 krwordrank
 wordcloud
 matplotlib
+unicode

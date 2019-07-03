@@ -1,6 +1,5 @@
 from collections import Counter
 
-from jpype import unicode
 from langdetect import detect
 
 from SmiToText.tokenizer import mecab
@@ -59,7 +58,6 @@ if __name__ == '__main__':
     while True:
         try:
             inputText = input("\n\n문장을 입력하세요?: \n")
-            inputText = unicode(inputText)
         except UnicodeDecodeError:
             print("다시 입력하세요\n")
             continue

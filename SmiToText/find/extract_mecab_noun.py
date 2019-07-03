@@ -1,6 +1,7 @@
 import argparse
 
 import os
+from datetime import date
 
 from SmiToText.tokenizer.nltk import nltkSentTokenizer
 from SmiToText.util.util import Util
@@ -140,6 +141,11 @@ def extract_file_noun(input, output):
                                             "ㅍ", "ㅊ", "ㅌ", "ㅋ", "ㅛ", "ㅕ", "ㅑ", "ㅐ", "ㅔ", "ㅗ", "ㅓ", "ㅏ", "ㅣ", "ㅠ", "ㅜ",
                                             "ㅡ"]:
                                     add_flag = False
+
+                            today = date.today().day
+                            if word != '기자' and word != word != date.today().day + '일':
+                                add_flag = False
+
                             if add_flag:
                                 output_file.write(word + os.linesep)
                                 sentence_words.append(word)
