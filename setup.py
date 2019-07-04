@@ -10,7 +10,6 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 install_requires = [
     #"numpy",
     #"mecab-python3",
-    #"jpype1",
     #"nltk",
     #"spacy",
     #"langdetect",
@@ -24,7 +23,7 @@ install_requires = [
 ]
 setup(
     name='SmiToText',
-    version='0.1445',
+    version='0.1446',
     py_modules = ['SmiToText'],
     packages=find_packages(exclude=['tests']),
     install_requires=install_requires,
