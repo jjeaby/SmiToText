@@ -129,7 +129,7 @@ def extract_file_noun(input, output):
 
                 if len(word_list):
                     for word in word_list:
-                        if util.check_email(word) or util.is_int(word) or util.is_alpha(word):
+                        if util.check_email(word) :
                             continue
                         else:
                             add_flag = True
