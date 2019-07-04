@@ -4,7 +4,7 @@ import os
 import re
 from datetime import date
 
-from jpype import unicode
+
 from konlpy.tag import Hannanum
 from konlpy.tag import Kkma
 from konlpy.tag import Komoran
