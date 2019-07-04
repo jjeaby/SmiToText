@@ -125,7 +125,7 @@ def extract_file_noun(input, output):
                         add_flag = True
                         for char in word:
                             if char in ["‘", "`", ",", "'", "\"", "\\", "|", "!", "@", "#", "$", "%", "^", "&", "*", "(",
-                                        ")", "※",
+                                        ")", "※", "~",
                                         "-", "_", "=", "+", "<", ">", ".", ";", ":",
                                         "ㄱ", "ㄴ", "ㄲ", "ㅂ", "ㅃ", "ㅈ", "ㅉ", "ㄷ", "ㄸ", "ㄱ", "ㅁ", "ㅇ", "ㄹ", "ㅎ", "ㅅ", "ㅆ",
                                         "ㅍ", "ㅊ", "ㅌ", "ㅋ", "ㅛ", "ㅕ", "ㅑ", "ㅐ", "ㅔ", "ㅗ", "ㅓ", "ㅏ", "ㅣ", "ㅠ", "ㅜ",
@@ -135,6 +135,8 @@ def extract_file_noun(input, output):
                                 and not word.endswith('니다') \
                                 and not word.endswith('그후로') \
                                 and not word.endswith('가요') \
+                                and not word.endswith('고요') \
+                                and not word.endswith('구요') \
                                 and not word.endswith('나요') \
                                 and not word.endswith('다요') \
                                 and not word.endswith('마요') \
@@ -162,8 +164,13 @@ def extract_file_noun(input, output):
                                 and not word.endswith('나') \
                                 and not word.endswith('넣') \
                                 and not word.endswith('먹') \
+                                and not word.endswith('있') \
                                 and not word.endswith('볼라') \
+                                and not word.endswith('…') \
                                 and not word.endswith('비트코') \
+                                and not word.endswith('기자') \
+                                and not word.endswith('할') \
+                                and not word.endswith('위안삼') \
                                 :
                             output_file.write(word + os.linesep)
                             sentence_words.append(word)
