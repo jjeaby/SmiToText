@@ -142,7 +142,7 @@ def extract_file_noun(input, output):
                                             "ㅡ"]:
                                     add_flag = False
 
-                            if word != '기자' or word != date.today().day + '일':
+                            if word == '기자' or word == str(date.today().day) + '일':
                                 add_flag = False
 
                             if add_flag:
