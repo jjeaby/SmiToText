@@ -2,7 +2,7 @@ import argparse
 import os
 import gc
 import time
-from datetime import date
+from datetime import datetime, timedelta
 
 from khaiii import KhaiiiApi
 
@@ -60,6 +60,9 @@ def extract_file_noun(input, output, time_interval=0):
     output_file.close()
     line_number = 1
     input_file = open(input, mode='r', encoding='utf-8')
+
+    yesterday_day = int((datetime.now() - timedelta(days=1)).strftime('%d'))
+
     while True:
         line = input_file.readline()
         if len(line) < 2  :
@@ -90,6 +93,9 @@ def extract_file_noun(input, output, time_interval=0):
             if len(word_list):
                 for word in word_list:
                     word = word.strip()
+
+
+
 
                     if util.check_email(word) or \
                                 ( word.endswith('니다') \
@@ -132,7 +138,7 @@ def extract_file_noun(input, output, time_interval=0):
                                      or word.endswith('할') \
                                      or word.endswith('위안삼') \
                                      or word == '기자' \
-                                     or word == str(date.today().day) + '일'
+                                     or word == str(yesterday_day) + '일'
                         ):
                         continue
                     else:

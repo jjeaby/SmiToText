@@ -2,7 +2,7 @@
 import argparse
 import os
 import re
-from datetime import date
+from datetime import datetime, timedelta
 
 from konlpy.tag import Okt
 
@@ -100,6 +100,8 @@ def extract_file_noun(input, output):
     input_file = open(input, mode='r', encoding='utf-8')
     open(output, mode='w', encoding='utf-8')
     line_number = 1
+    yesterday_day = int((datetime.now() - timedelta(days=1)).strftime('%d'))
+
     while (True):
         line = input_file.readline()
         if not line:
@@ -169,7 +171,7 @@ def extract_file_noun(input, output):
                                      and not word.endswith('할') \
                                      and not word.endswith('위안삼') \
                                      and not word == '기자' \
-                                     and not word == str(date.today().day) + '일'
+                                     and not word == str(yesterday_day) + '일'
                         ):
                             sentence_words.append(word)
 
