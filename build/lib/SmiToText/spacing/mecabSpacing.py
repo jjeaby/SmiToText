@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
 
-from jpype import unicode
-
 import SmiToText.tokenizer.mecab as mecab
 
 from SmiToText.util.util import Util
@@ -403,7 +401,6 @@ if __name__ == '__main__':
     while True:
         try:
             inputText = input("\n\n문장을 입력하세요?: \n")
-            inputText = unicode(inputText)
         except UnicodeDecodeError:
             print("다시 입력하세요\n")
             continue

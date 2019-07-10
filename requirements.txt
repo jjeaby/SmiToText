@@ -1,6 +1,5 @@
 numpy
 mecab-python3
-jpype1
 nltk
 spacy
 langdetect
@@ -13,4 +12,3 @@ caret
 krwordrank
 wordcloud
 matplotlib
-unicode

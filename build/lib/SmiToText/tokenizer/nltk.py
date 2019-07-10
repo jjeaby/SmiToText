@@ -1,5 +1,3 @@
-from jpype import unicode
-from nltk.tokenize import word_tokenize
 import nltk.data
 
 
@@ -28,7 +26,6 @@ if __name__ == '__main__':
     while True:
         try:
             inputText = input("\n\n문장을 입력하세요?: \n")
-            inputText = unicode(inputText)
         except UnicodeDecodeError:
             print("다시 입력하세요\n")
             continue

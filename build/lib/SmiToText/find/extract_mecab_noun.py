@@ -1,6 +1,7 @@
 import argparse
 
 import os
+from datetime import date
 
 from SmiToText.tokenizer.nltk import nltkSentTokenizer
 from SmiToText.util.util import Util
@@ -128,7 +129,7 @@ def extract_file_noun(input, output):
 
                 if len(word_list):
                     for word in word_list:
-                        if util.check_email(word) or util.is_int(word) or util.is_alpha(word):
+                        if util.check_email(word) :
                             continue
                         else:
                             add_flag = True
@@ -140,6 +141,10 @@ def extract_file_noun(input, output):
                                             "ㅍ", "ㅊ", "ㅌ", "ㅋ", "ㅛ", "ㅕ", "ㅑ", "ㅐ", "ㅔ", "ㅗ", "ㅓ", "ㅏ", "ㅣ", "ㅠ", "ㅜ",
                                             "ㅡ"]:
                                     add_flag = False
+
+                            if word == '기자' or word == str(date.today().day) + '일':
+                                add_flag = False
+
                             if add_flag:
                                 output_file.write(word + os.linesep)
                                 sentence_words.append(word)

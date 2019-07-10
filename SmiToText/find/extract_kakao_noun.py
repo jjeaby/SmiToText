@@ -2,6 +2,7 @@ import argparse
 import os
 import gc
 import time
+from datetime import date
 
 from khaiii import KhaiiiApi
 
@@ -88,8 +89,51 @@ def extract_file_noun(input, output, time_interval=0):
 
             if len(word_list):
                 for word in word_list:
-                    # if util.check_email(word) or util.is_int(word) or util.is_alpha(word):
-                    if util.check_email(word) :
+                    word = word.strip()
+
+                    if util.check_email(word) or \
+                                ( word.endswith('니다') \
+                                     or word.endswith('그후로') \
+                                     or word.endswith('가요') \
+                                     or word.endswith('고요') \
+                                     or word.endswith('구요') \
+                                     or word.endswith('나요') \
+                                     or word.endswith('다요') \
+                                     or word.endswith('마요') \
+                                     or word.endswith('바요') \
+                                     or word.endswith('사요') \
+                                     or word.endswith('어요') \
+                                     or word.endswith('자요') \
+                                     or word.endswith('차요') \
+                                     or word.endswith('타요') \
+                                     or word.endswith('해요') \
+                                     or word.endswith('세요') \
+                                     or word.endswith('네요') \
+                                     or word.endswith('케요') \
+                                     or word.endswith('군요') \
+                                     or word.endswith('하') \
+                                     or word.endswith('텐데') \
+                                     or word.endswith('건데') \
+                                     or word.endswith('을려') \
+                                     or word.endswith('을껄') \
+                                     or word.endswith('습니') \
+                                     or word.endswith('씁니') \
+                                     or word.endswith('좀') \
+                                     or word.endswith('처럼') \
+                                     or word.endswith('된') \
+                                     or word.endswith('나') \
+                                     or word.endswith('넣') \
+                                     or word.endswith('먹') \
+                                     or word.endswith('있') \
+                                     or word.endswith('볼라') \
+                                     or word.endswith('…') \
+                                     or word.endswith('비트코') \
+                                     or word.endswith('기자') \
+                                     or word.endswith('할') \
+                                     or word.endswith('위안삼') \
+                                     or word == '기자' \
+                                     or word == str(date.today().day) + '일'
+                        ):
                         continue
                     else:
                         if word.startswith(".") or word.startswith(",") or word.startswith(
@@ -118,6 +162,7 @@ def extract_file_noun(input, output, time_interval=0):
 
                         sentence_words.append(word)
                         # print(line_number, word)
+                    # if util.check_email(word) or util.is_int(word) or util.is_alpha(word):
             del word_list
 
         time.sleep(time_interval)
