@@ -15,3 +15,5 @@ koPyCrfsuit-models/*
 data/koDetokenizerData
 __pycache__
 *.pyc
+dist/*
+SmiToText.egg-info

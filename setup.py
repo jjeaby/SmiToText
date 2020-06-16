@@ -8,22 +8,28 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 
 install_requires = [
-    #"numpy",
-    #"mecab-python3",
-    #"nltk",
-    #"spacy",
-    #"langdetect",
-    #"soyspacing",
-    #"scipy",
-    #"scikit-learn",
-    #"python-crfsuite",
-    #"tensorflow==1.8.0",
-    #"caret",
-
+    "numpy",
+    "mecab-python3",
+    "nltk",
+    "spacy",
+    "langdetect",
+    "soyspacing",
+    "scipy",
+    "scikit-learn",
+    "python-crfsuite",
+    "tensorflow",
+    "caret",
+    "krwordrank",
+    "wordcloud",
+    "matplotlib",
+    "pillow",
+    "krwordrank",
+    "konlpy"
 ]
+
 setup(
     name='SmiToText',
-    version='0.1457',
+    version='0.1465',
     py_modules = ['SmiToText'],
     packages=find_packages(exclude=['tests']),
     install_requires=install_requires,
@@ -42,6 +48,7 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6'
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7'
     ]
 )

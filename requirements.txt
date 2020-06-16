@@ -7,8 +7,11 @@ soyspacing
 scipy
 scikit-learn
 python-crfsuite
-tensorflow-gpu
+tensorflow
 caret
 krwordrank
 wordcloud
 matplotlib
+pillow
+krwordrank
+konlpy
