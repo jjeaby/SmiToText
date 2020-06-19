@@ -6,6 +6,7 @@ from konlpy.tag import Mecab
 from krwordrank.word import KRWordRank
 
 from SmiToText import __ROOT_DIR__
+from SmiToText.util.util import Util
 
 
 def in_dict(dict_data, key):
@@ -53,26 +54,33 @@ def expect_multi_noun_text(sentence):
                     else:
                         extract_noun_score[noun] += 0.75
 
-    return extract_noun, extract_noun_score
+    return sorted_dict(extract_noun_score)
 
 
-def cleaning_multi_noun(multi_noun_list=[], cleaning_count=2):
+def cleaning_multi_noun(multi_noun_list=[], multi_noun_list_score=[], cleaning_count=2):
     multi_noun_list = copy.deepcopy(multi_noun_list)
     cleaning_multi_noun_result = []
     cleaning_multi_noun_result_score = {}
 
     cleaning_multi_noun_result_score
     for multi_noun in multi_noun_list:
-        isOnlyEngNum = re.sub('[a-zA-Z0-9가-힣]', '', multi_noun)
+        isOnlyEngNum = re.sub('[a-zA-Z0-9]', '', multi_noun)
         # print(multi_noun)
         if len(isOnlyEngNum.strip()) == 0:
             multi_noun = re.sub("[\s]+", " ", multi_noun)
             cleaning_multi_noun_result.append(multi_noun)
-            if in_dict(cleaning_multi_noun_result_score, multi_noun) == False:
-                cleaning_multi_noun_result_score[multi_noun] = 0.75
+            if len(multi_noun_list_score) == 0:
+                if in_dict(cleaning_multi_noun_result_score, multi_noun) == False:
+                    cleaning_multi_noun_result_score[multi_noun] = 0.75
+                else:
+                    cleaning_multi_noun_result_score[multi_noun] += 0.75
+                continue
             else:
-                cleaning_multi_noun_result_score[multi_noun] += 0.75
-            continue
+                if in_dict(cleaning_multi_noun_result_score, multi_noun) == False:
+                    cleaning_multi_noun_result_score[multi_noun] = multi_noun_list_score[multi_noun]
+                else:
+                    cleaning_multi_noun_result_score[multi_noun] += multi_noun_list_score[multi_noun]
+                continue
 
         multi_noun_space_splitter = multi_noun.split(" ")
         if len(multi_noun_space_splitter) >= 2:
@@ -94,12 +102,21 @@ def cleaning_multi_noun(multi_noun_list=[], cleaning_count=2):
             if re.search(r"\s", candidate_multi_noun):
                 cleaning_multi_noun_result.append(candidate_multi_noun)
                 # cleaning_multi_noun_result_score[candidate_multi_noun] = 0.75
-                if in_dict(cleaning_multi_noun_result_score, candidate_multi_noun) == False:
-                    cleaning_multi_noun_result_score[candidate_multi_noun] = 0.75
-                else:
-                    cleaning_multi_noun_result_score[candidate_multi_noun] += 0.75
 
-    return cleaning_multi_noun_result, cleaning_multi_noun_result_score
+                if len(multi_noun_list_score) == 0:
+                    if in_dict(cleaning_multi_noun_result_score, candidate_multi_noun) == False:
+                        cleaning_multi_noun_result_score[candidate_multi_noun] = 0.75
+                    else:
+                        cleaning_multi_noun_result_score[candidate_multi_noun] += 0.75
+                else:
+                    if in_dict(cleaning_multi_noun_result_score, candidate_multi_noun) == False:
+                        cleaning_multi_noun_result_score[candidate_multi_noun] = multi_noun_list_score[
+                            candidate_multi_noun]
+                    else:
+                        cleaning_multi_noun_result_score[candidate_multi_noun] += multi_noun_list_score[
+                            candidate_multi_noun]
+
+    return sorted_dict(cleaning_multi_noun_result_score)
 
 
 def krwordrank_noun(sentence_list=[], min_count=5, max_length=10, beta=0.85, max_iter=10, verbose=False):
@@ -117,11 +134,11 @@ def krwordrank_noun(sentence_list=[], min_count=5, max_length=10, beta=0.85, max
                 if len(word_cleansing) == len(word):
                     krword_rank_noun.append(word)
                     krword_rank_noun_score[word] = r
-        return krword_rank_noun, krword_rank_noun_score
+        return sorted_dict(krword_rank_noun_score)
     except:
         krword_rank_noun = []
         krword_rank_noun_score = {}
-        return krword_rank_noun, krword_rank_noun_score
+        return sorted_dict(krword_rank_noun_score)
 
 
 def levenshtein(s1, s2, debug=False):
@@ -148,9 +165,6 @@ def levenshtein(s1, s2, debug=False):
     return previous_row[-1]
 
 
-test_data = open(__ROOT_DIR__ + "/data/article-text.txt", mode='r', encoding='utf-8')
-
-lines = test_data.readlines()
 
 
 def check_stopword(multi_noun, multi_noun_score, stop_word=[]):
@@ -186,62 +200,142 @@ def check_stopword(multi_noun, multi_noun_score, stop_word=[]):
 
     for noun in multi_noun:
         if len(set(stop_word).difference(noun.split())) == len(stop_word) \
+                and not Util().is_int(noun) \
                 and not str(noun).endswith('니다') \
                 and not str(noun).endswith('이다'):
             check_multi_noun.append(noun)
             check_multi_noun_score[noun] = multi_noun_score[noun]
 
-    return check_multi_noun, check_multi_noun_score
+    return sorted_dict(check_multi_noun_score)
+
+
+def sorted_dict(multi_noun_score):
+    ret_check_multi_noun = []
+    ret_check_multi_noun_score = {}
+    for noun, r in sorted(multi_noun_score.items(), key=lambda x: x[1], reverse=True)[
+                   :len(multi_noun_score)]:
+        # print(r, word)
+        ret_check_multi_noun.append(noun)
+        ret_check_multi_noun_score[noun] = r
+
+    return ret_check_multi_noun, ret_check_multi_noun_score
+
+
+def multi_noun_score_add(multi_noun_score, krword_rank_once_noun_score):
+    for multi_noun in multi_noun_score.keys():
+        temp_multi_noun = re.sub("[\s]+", " ", multi_noun)
+        for krword_noun in krword_rank_once_noun_score.keys():
+            temp_krword_noun = re.sub("[\s]+", " ", krword_noun)
+
+            if len(temp_multi_noun) > len(temp_krword_noun):
+                if len(temp_multi_noun.replace(temp_krword_noun, "")) < len(temp_multi_noun):
+                    multi_noun_score[multi_noun] += krword_rank_once_noun_score[krword_noun]
+            else:
+                if len(temp_krword_noun.replace(temp_multi_noun, "")) < len(temp_krword_noun):
+                    multi_noun_score[multi_noun] += krword_rank_once_noun_score[krword_noun]
+
+    return sorted_dict(multi_noun_score)
+
+
+def text_in_mult_noun_finder(multi_noun, multi_noun_score, text):
+    text_in_multi_noun = []
+    text_in_multi_noun_score = {}
+    for noun in multi_noun:
+        max_try = len(noun.split(' '))
+        for try_count_1 in range(0, max_try):
+            try_count_1_text = ' '.join(noun.split(' ')[:try_count_1])
+            try_count_2_text = ' '.join(noun.split(' ')[try_count_1:])
+            for try_count_2 in range(0, (max_try - try_count_1)):
+
+                find_multi_noun = try_count_1_text + str(try_count_2_text).replace(" ", "", try_count_2)
+                if text.find(find_multi_noun) >= 0:
+                    text_in_multi_noun.append(find_multi_noun)
+                    text_in_multi_noun_score[find_multi_noun] = multi_noun_score[noun]
+
+    text_in_multi_noun_result = copy.deepcopy(text_in_multi_noun)
+    text_in_multi_noun_result_socre = copy.deepcopy(text_in_multi_noun_score)
+
+    for noun in text_in_multi_noun:
+        if noun.find(' ') < 0:
+            remove_flag = False
+            for multi_noun in text_in_multi_noun:
+                if len(noun) < len(multi_noun) and multi_noun.find(noun) >= 0:
+                    # text_in_multi_noun_result(noun)
+                    # print(multi_noun)
+                    # print(noun)
+                    text_in_multi_noun_result_socre[multi_noun] += text_in_multi_noun_score[noun]
+                    remove_flag = True
+            if remove_flag :
+               text_in_multi_noun_result_socre[noun] = 0
+
+
+    return sorted_dict(text_in_multi_noun_result_socre)
+
+
+def extract_mecab_multi_noun(text):
+    text = text.strip()
+
+    multi_noun = []
+    multi_noun_score = {}
+    krword_rank_noun = []
+    krword_rank_noun_score = {}
+    krword_rank_once_noun = []
+    krword_rank_once_noun_score = {}
+
+    if text:
+        sentence_list = text.split(".")
+        # print(sentence_list)
+
+        for sentence in sentence_list:
+            sentence = sentence.strip()
+            if sentence:
+                first_multi_noun_list, _ = expect_multi_noun_text(sentence)
+                second_multi_noun_list, second_multi_noun_list_score = cleaning_multi_noun(first_multi_noun_list,
+                                                                                           cleaning_count=2)
+                # print("origin : ", sentence)
+                # print(second_multi_noun_list, second_multi_noun_list_score)
+
+                multi_noun.extend(second_multi_noun_list)
+                multi_noun_score.update(second_multi_noun_list_score)
+
+        krword_rank_noun, krword_rank_noun_score = krwordrank_noun(sentence_list=sentence_list, min_count=3)
+        krword_rank_once_noun, krword_rank_once_noun_score = krwordrank_noun(sentence_list=sentence_list,
+                                                                             min_count=2)
+
+    # print(multi_noun, multi_noun_score)
+    # print(krword_rank_noun, krword_rank_noun_score)
+    # print(krword_rank_once_noun, krword_rank_once_noun_score)
+
+    multi_noun.extend(krword_rank_noun)
+    multi_noun_score.update(krword_rank_noun_score)
+    # multi_noun = multi_noun.extend(krword_rank_once_noun)
+    # print(multi_noun, multi_noun_score)
+
+    # print("-" * 100)
+    multi_noun, multi_noun_score = check_stopword(multi_noun, multi_noun_score)
+    krword_rank_noun, krword_rank_noun_score = check_stopword(krword_rank_noun, krword_rank_noun_score)
+    krword_rank_once_noun, krword_rank_once_noun_score = check_stopword(krword_rank_once_noun,
+                                                                        krword_rank_once_noun_score)
+
+    # print(multi_noun, multi_noun_score)
+    # print(krword_rank_noun, krword_rank_noun_score)
+    # print(krword_rank_once_noun, krword_rank_once_noun_score)
+
+    # print("0" * 100)
+    # print(multi_noun_score)
+    multi_noun, multi_noun_score = multi_noun_score_add(multi_noun_score,
+                                                        krword_rank_once_noun_score)
+    # print("0" * 100)
+    # print(multi_noun, multi_noun_score)
+
+    print(text_in_mult_noun_finder(multi_noun, multi_noun_score, text))
+
 
 if __name__ == '__main__':
+
+    test_data = open(__ROOT_DIR__ + "/data/article-text.txt", mode='r', encoding='utf-8')
+
+    lines = test_data.readlines()
+
     for line in lines:
-        line = line.strip()
-        multi_noun = []
-        multi_noun_score = {}
-        krword_rank_noun = []
-        krword_rank_noun_score = {}
-        krword_rank_once_noun = []
-        krword_rank_once_noun_score = {}
-
-        if line:
-            sentence_list = line.split(".")
-            # print(sentence_list)
-
-            for sentence in sentence_list:
-                sentence = sentence.strip()
-                if sentence:
-                    first_multi_noun_list, _ = expect_multi_noun_text(sentence)
-                    second_multi_noun_list, second_multi_noun_list_score = cleaning_multi_noun(first_multi_noun_list,
-                                                                                               cleaning_count=2)
-                    print("origin : ", sentence)
-                    print("first : ", first_multi_noun_list)
-                    print("second : ", second_multi_noun_list)
-                    print("second score : ", second_multi_noun_list_score)
-                    multi_noun = second_multi_noun_list
-                    multi_noun_score = second_multi_noun_list_score
-                    print("multi noun scpre : ", multi_noun_score)
-
-            krword_rank_noun, krword_rank_noun_score = krwordrank_noun(sentence_list=sentence_list, min_count=3)
-            krword_rank_noun, krword_rank_noun_score = cleaning_multi_noun(krword_rank_noun,
-                                                                                       cleaning_count=1)
-            krword_rank_once_noun, krword_rank_once_noun_score = krwordrank_noun(sentence_list=sentence_list, min_count=2)
-            krword_rank_once_noun, krword_rank_once_noun_score = cleaning_multi_noun(krword_rank_once_noun,
-                                                                                       cleaning_count=1)
-        print(multi_noun, multi_noun_score)
-        print(krword_rank_noun, krword_rank_noun_score)
-        print(krword_rank_once_noun, krword_rank_once_noun_score)
-
-        multi_noun.extend(krword_rank_noun)
-        multi_noun_score.update(krword_rank_noun_score)
-        # multi_noun = multi_noun.extend(krword_rank_once_noun)
-        print(multi_noun, multi_noun_score)
-
-        print("-" * 100)
-        multi_noun, multi_noun_score = check_stopword(multi_noun, multi_noun_score)
-        krword_rank_noun, krword_rank_noun_score = check_stopword(krword_rank_noun, krword_rank_noun_score)
-        krword_rank_once_noun, krword_rank_once_noun_score = check_stopword(krword_rank_once_noun,
-                                                                            krword_rank_once_noun_score)
-
-        print(multi_noun, multi_noun_score)
-        print(krword_rank_noun, krword_rank_noun_score)
-        print(krword_rank_once_noun, krword_rank_once_noun_score)
+        extract_mecab_multi_noun(line)
