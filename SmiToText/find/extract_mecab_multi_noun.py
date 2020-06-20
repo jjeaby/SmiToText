@@ -162,7 +162,7 @@ def krwordrank_noun(sentence_list=[], min_count=5, max_length=10, beta=0.85, max
             # print(r, word)
             word = re.sub("[\s]+", " ", word)
             if len(word) > 1:
-                word_cleansing = re.sub('[-=+,#/\?:^$.@*\"※~&%ㆍ!』\\'|\(\)\[\]\<\>`\'…》\^\)\(]', '', word)
+                word_cleansing = re.sub('[-=+,#/\?:^$.@*\"※~&%ㆍ!』\\‘|\(\)\[\]\<\>`\'…》\^\)\(]', '', word)
                 if len(word_cleansing) == len(word):
                     krword_rank_noun.append(word)
                     krword_rank_noun_score[word] = r
@@ -358,7 +358,7 @@ def extract_mecab_multi_noun(text, item_counter=0):
 #         print(multi_noun, multi_noun_score)
 #
 
-def extract_file_noun(input, output):
+def extract_file_noun(input, output, item_counter=0):
     input_file = open(input, mode='r', encoding='utf-8')
     open(output, mode='w', encoding='utf-8')
     output_file = open(output, mode='a', encoding='utf-8')
@@ -373,7 +373,7 @@ def extract_file_noun(input, output):
         for line_array in line.split("\n"):
 
             line_array_multi_noun = []
-            multi_noun_list, multi_noun_list_score = extract_mecab_multi_noun(line_array, item_counter=0)
+            multi_noun_list, multi_noun_list_score = extract_mecab_multi_noun(line_array, item_counter=item_counter)
 
             if len(multi_noun_list):
                 for index, word in enumerate( multi_noun_list ):
@@ -388,7 +388,7 @@ def extract_file_noun(input, output):
                                         "ㄱ", "ㄴ", "ㄲ", "ㅂ", "ㅃ", "ㅈ", "ㅉ", "ㄷ", "ㄸ", "ㄱ", "ㅁ", "ㅇ", "ㄹ", "ㅎ", "ㅅ",
                                         "ㅆ",
                                         "ㅍ", "ㅊ", "ㅌ", "ㅋ", "ㅛ", "ㅕ", "ㅑ", "ㅐ", "ㅔ", "ㅗ", "ㅓ", "ㅏ", "ㅣ", "ㅠ", "ㅜ",
-                                        "ㅡ"]:
+                                        "ㅡ", " "]:
                                 add_flag = False
 
                         if word == '기자' or word == str(date.today().day) + '일':
@@ -396,9 +396,9 @@ def extract_file_noun(input, output):
 
                         if add_flag:
                             word_score = {word: multi_noun_list_score[word]}
-                            output_file.write( str(word_score) + os.linesep)
                             line_array_multi_noun.append(word_score)
                         # print(line_number, word)
+        output_file.write(str(line_array_multi_noun) + os.linesep)
         print(line_number, line_array_multi_noun)
         line_number += 1
 
@@ -408,6 +408,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Extract File Noun word")
     parser.add_argument('--input', type=str, required=True, default='', help='Input File')
     parser.add_argument('--output', type=str, required=True, default='', help='Output File')
+    parser.add_argument('--count', type=int, required=False, default=0, help='Item Count Number')
     args = parser.parse_args()
 
     if not args.input:
@@ -420,5 +421,6 @@ if __name__ == '__main__':
 
     input = str(args.input)
     output = str(args.output)
+    item_counter = args.count
 
-    extract_file_noun(input, output)
+    extract_file_noun(input, output, item_counter=item_counter)
