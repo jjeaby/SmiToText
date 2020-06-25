@@ -37,7 +37,8 @@ all_stop_word = ['가령', '각각', '각자', '각종', '같다', '같이', '�
                  '한 후', '한다면', '한데', '한마디', '한편', '한항목', '할때', '할만하다', '할망정', '할뿐', '할수있다', '할수있어', '할줄알다', '할지라도',
                  '할지언정', '함께', '해도된다', '해도좋다', '해봐요', '해야한다', '해요', '했어요', '향하다', '향하여', '향해서', '허걱', '허허', '헉헉',
                  '혹시', '혹은', '혼자', '훨씬', '휘익', '힘입어', '네이버 메인', '말했다', '못했다는', '대해', '현산', '위한', '충분히', '\\n', '것도',
-                 '했다', '있는', '제공받지', '없다', '이날오전', '하고',  '이날만기', '배포금지', '함수추가', '무단전재', '본문내용', 'news', '머니투데이', '네이버연합뉴스',
+                 '했다', '있는', '제공받지', '없다', '이날오전', '하고', '이날만기', '배포금지', '함수추가', '무단전재', '본문내용', 'news', '머니투데이',
+                 '네이버연합뉴스',
                  '구독클릭', '부여스마트', '공감언론', '소재나이스', 'channa224', 'com▶['
                  ]
 
@@ -90,6 +91,44 @@ def expect_multi_noun_text(sentence):
     return sorted_dict(extract_noun_score)
 
 
+def expect_single_noun_text(sentence):
+    # Define a chunk grammar, or chunking rules, then chunk
+
+    grammar = """
+    명사1: {<SL>}
+    명사1: {<SN>}
+
+    명사1: {<NNG>}
+    명사2: {<NN.*>}
+
+
+    동사구: {<NP\+VCP\+EF>}
+    동사구: {<NP><VCP\+EF>}
+    형용사: {<MA.*>*}
+    """
+    mecab = Mecab()
+
+    postagged_sentence = mecab.pos(sentence)
+    nltk_rexp_parser = nltk.RegexpParser(grammar)
+    chunks_sentence = nltk_rexp_parser.parse(postagged_sentence)
+
+    extract_noun = []
+    extract_noun_score = {}
+    for subtree in chunks_sentence.subtrees():
+        if subtree.label().startswith('명사'):
+            if len(' '.join((e[0] for e in list(subtree)))) > 1:
+                noun = ' '.join((e[0] for e in list(subtree)))
+                if re.search(r"\s", noun):
+                    extract_noun.append(noun)
+                    # extract_noun_score[noun] = 0.75
+                    if in_dict(extract_noun_score, noun) == False:
+                        extract_noun_score[noun] = 0.75
+                    else:
+                        extract_noun_score[noun] += 0.75
+
+    return sorted_dict(extract_noun_score)
+
+
 def cleaning_multi_noun(multi_noun_list=[], multi_noun_list_score=[], cleaning_count=2):
     multi_noun_list = copy.deepcopy(multi_noun_list)
     cleaning_multi_noun_result = []
@@ -115,39 +154,55 @@ def cleaning_multi_noun(multi_noun_list=[], multi_noun_list_score=[], cleaning_c
                     cleaning_multi_noun_result_score[multi_noun] += multi_noun_list_score[multi_noun]
                 continue
 
+        # print(multi_noun)
         multi_noun_space_splitter = multi_noun.split(" ")
         if len(multi_noun_space_splitter) >= 2:
+            # print(multi_noun)
             candidate_multi_noun = ""
             for index in range(cleaning_count):
+
                 if len(multi_noun_space_splitter[-1]) == 1:
                     candidate_multi_noun = ' '.join(multi_noun_space_splitter[:-1])
-                else:
-                    candidate_multi_noun = ' '.join(multi_noun_space_splitter)
+                elif len(multi_noun_space_splitter[0]) == 1:
+                    candidate_multi_noun = ' '.join(multi_noun_space_splitter[1:])
+
+                multi_noun_space_splitter = candidate_multi_noun.split(" ")
+
+            # print(candidate_multi_noun)
 
             for index in range(cleaning_count):
                 multi_noun_space_splitter = candidate_multi_noun.split(" ")
                 if len(multi_noun_space_splitter[0]) == 1:
                     candidate_multi_noun = ' '.join(multi_noun_space_splitter[1:])
-                else:
-                    candidate_multi_noun = ' '.join(multi_noun_space_splitter)
+                elif len(multi_noun_space_splitter[-1]) == 1:
+                    candidate_multi_noun = ' '.join(multi_noun_space_splitter[:-1])
+
                 candidate_multi_noun = re.sub("[\s]+", " ", candidate_multi_noun)
 
-            if re.search(r"\s", candidate_multi_noun):
-                cleaning_multi_noun_result.append(candidate_multi_noun)
-                # cleaning_multi_noun_result_score[candidate_multi_noun] = 0.75
+            # print(candidate_multi_noun)
 
-                if len(multi_noun_list_score) == 0:
+            if candidate_multi_noun.strip() != '':
+                if re.search(r"\s", candidate_multi_noun):
+                    cleaning_multi_noun_result.append(candidate_multi_noun)
+                    # cleaning_multi_noun_result_score[candidate_multi_noun] = 0.75
+
+                    if len(multi_noun_list_score) == 0:
+                        if in_dict(cleaning_multi_noun_result_score, candidate_multi_noun) == False:
+                            cleaning_multi_noun_result_score[candidate_multi_noun] = 0.75
+                        else:
+                            cleaning_multi_noun_result_score[candidate_multi_noun] += 0.75
+                    else:
+                        if in_dict(cleaning_multi_noun_result_score, candidate_multi_noun) == False:
+                            cleaning_multi_noun_result_score[candidate_multi_noun] = multi_noun_list_score[
+                                candidate_multi_noun]
+                        else:
+                            cleaning_multi_noun_result_score[candidate_multi_noun] += multi_noun_list_score[
+                                candidate_multi_noun]
+                else:
                     if in_dict(cleaning_multi_noun_result_score, candidate_multi_noun) == False:
                         cleaning_multi_noun_result_score[candidate_multi_noun] = 0.75
                     else:
                         cleaning_multi_noun_result_score[candidate_multi_noun] += 0.75
-                else:
-                    if in_dict(cleaning_multi_noun_result_score, candidate_multi_noun) == False:
-                        cleaning_multi_noun_result_score[candidate_multi_noun] = multi_noun_list_score[
-                            candidate_multi_noun]
-                    else:
-                        cleaning_multi_noun_result_score[candidate_multi_noun] += multi_noun_list_score[
-                            candidate_multi_noun]
 
     return sorted_dict(cleaning_multi_noun_result_score)
 
@@ -309,7 +364,8 @@ def text_in_mult_noun_finder(multi_noun, multi_noun_score, text):
         #     text_in_noun_result_score[noun] = text_in_multi_noun_score[noun]
 
     text_in_multi_noun_result, text_in_multi_noun_result_score = sorted_dict(text_in_noun_result_score)
-    text_in_multi_noun_result, text_in_multi_noun_result_score = check_stopword(text_in_multi_noun_result, text_in_multi_noun_result_score)
+    text_in_multi_noun_result, text_in_multi_noun_result_score = check_stopword(text_in_multi_noun_result,
+                                                                                text_in_multi_noun_result_score)
 
     return sorted_dict(text_in_multi_noun_result_score)
 
@@ -333,6 +389,10 @@ def extract_mecab_multi_noun(text, item_counter=0):
             sentence = sentence.strip()
             if sentence:
                 first_multi_noun_list, _ = expect_multi_noun_text(sentence)
+                first_single_noun_list, _ = expect_single_noun_text(sentence)
+
+                first_multi_noun_list.extend(first_single_noun_list)
+                # print(first_multi_noun_list)
                 second_multi_noun_list, second_multi_noun_list_score = cleaning_multi_noun(first_multi_noun_list,
                                                                                            cleaning_count=2)
                 # second_multi_noun_list, second_multi_noun_list_score = check_stopword(second_multi_noun_list, second_multi_noun_list_score)
