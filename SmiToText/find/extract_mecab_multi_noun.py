@@ -37,7 +37,7 @@ all_stop_word = ['가령', '각각', '각자', '각종', '같다', '같이', '�
                  '한 후', '한다면', '한데', '한마디', '한편', '한항목', '할때', '할만하다', '할망정', '할뿐', '할수있다', '할수있어', '할줄알다', '할지라도',
                  '할지언정', '함께', '해도된다', '해도좋다', '해봐요', '해야한다', '해요', '했어요', '향하다', '향하여', '향해서', '허걱', '허허', '헉헉',
                  '혹시', '혹은', '혼자', '훨씬', '휘익', '힘입어', '네이버 메인', '말했다', '못했다는', '대해', '현산', '위한', '충분히', '\\n', '것도',
-                 '했다', '있는', '제공받지', '없다', '이날오전', '이날만기', '배포금지', '함수추가', '무단전재', '본문내용', 'news', '머니투데이', '네이버연합뉴스',
+                 '했다', '있는', '제공받지', '없다', '이날오전', '하고',  '이날만기', '배포금지', '함수추가', '무단전재', '본문내용', 'news', '머니투데이', '네이버연합뉴스',
                  '구독클릭', '부여스마트', '공감언론', '소재나이스', 'channa224', 'com▶['
                  ]
 
@@ -280,45 +280,36 @@ def text_in_mult_noun_finder(multi_noun, multi_noun_score, text):
 
                 find_multi_noun = try_count_1_text + str(try_count_2_text).replace(" ", "", try_count_2)
                 if text.find(find_multi_noun) >= 0:
-                    text_in_multi_noun.append(find_multi_noun)
-                    text_in_multi_noun_score[find_multi_noun] = multi_noun_score[noun]
+                    if find_multi_noun not in text_in_multi_noun_score.keys():
+                        text_in_multi_noun.append(find_multi_noun)
+                        text_in_multi_noun_score[find_multi_noun] = multi_noun_score[noun]
 
     text_in_noun_result = copy.deepcopy(text_in_multi_noun)
     text_in_noun_result_score = copy.deepcopy(text_in_multi_noun_score)
 
-    for noun in text_in_multi_noun:
+    for index, noun in enumerate(text_in_noun_result):
         start_position = text.find(noun)
+        # print(index, noun, start_position)
         if start_position > 0:
             prefix_char = ""
-            for position in range(start_position - 1,  0, -1):
+            for position in range(start_position - 1, 0, -1):
+                # print(text[position])
                 if text[position] != ' ':
                     prefix_char = text[position] + prefix_char
                 else:
                     break
 
-            # print(prefix_char)
-            if re.sub('[가-힣·]', '', prefix_char) == '':
+            # print(text_in_multi_noun_score[noun])
+            if re.sub('[가-힣·\s]', '', prefix_char) == '' and prefix_char.strip() != '':
                 text_in_noun_result_score[prefix_char + noun] = text_in_multi_noun_score[noun]
                 text_in_noun_result_score[noun] = 0
             else:
                 text_in_noun_result_score[noun] = text_in_multi_noun_score[noun]
-        else:
-            text_in_noun_result_score[noun] = text_in_multi_noun_score[noun]
+        # else:
+        #     text_in_noun_result_score[noun] = text_in_multi_noun_score[noun]
 
     text_in_multi_noun_result, text_in_multi_noun_result_score = sorted_dict(text_in_noun_result_score)
-
-    for noun in text_in_multi_noun_result:
-        if noun.find(' ') < 0:
-            remove_flag = False
-            for multi_noun in text_in_multi_noun_result:
-                if len(noun) < len(multi_noun) and multi_noun.find(noun) >= 0:
-                    # text_in_multi_noun_result(noun)
-                    # print(multi_noun)
-                    # print(noun)
-                    text_in_multi_noun_result_score[multi_noun] += text_in_noun_result_score[noun]
-                    remove_flag = True
-            if remove_flag:
-                text_in_multi_noun_result_score[noun] = 0
+    text_in_multi_noun_result, text_in_multi_noun_result_score = check_stopword(text_in_multi_noun_result, text_in_multi_noun_result_score)
 
     return sorted_dict(text_in_multi_noun_result_score)
 
@@ -391,6 +382,9 @@ def extract_mecab_multi_noun(text, item_counter=0):
     # print(multi_noun, multi_noun_score)
     multi_noun, multi_noun_score = remove_stopword(multi_noun, multi_noun_score)
 
+    # print("0" * 100)
+    # print(multi_noun, multi_noun_score)
+    # print( multi_noun_score)
     return_multi_noun, return_multi_noun_score = text_in_mult_noun_finder(multi_noun, multi_noun_score, text)
 
     if item_counter == 0:
