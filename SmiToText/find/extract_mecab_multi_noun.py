@@ -38,6 +38,7 @@ all_stop_word = ['가령', '각각', '각자', '각종', '같다', '같이', '�
                  '할지언정', '함께', '해도된다', '해도좋다', '해봐요', '해야한다', '해요', '했어요', '향하다', '향하여', '향해서', '허걱', '허허', '헉헉',
                  '혹시', '혹은', '혼자', '훨씬', '휘익', '힘입어', '네이버 메인', '말했다', '못했다는', '대해', '현산', '위한', '충분히', '\\n', '것도',
                  '했다', '있는', '제공받지', '없다', '이날오전', '하고', '이날만기', '배포금지', '함수추가', '무단전재', '본문내용', 'news', '머니투데이',
+                 '어떻', '당시', '그러면서',
                  '네이버연합뉴스',
                  '구독클릭', '부여스마트', '공감언론', '소재나이스', 'channa224', 'com▶['
                  ]
@@ -51,7 +52,41 @@ def in_dict(dict_data, key):
         return False
 
 
-def expect_multi_noun_text(sentence):
+def expect_multi_noun_text_en(sentence):
+    # Define a chunk grammar, or chunking rules, then chunk
+
+    grammar = """
+     NBAR:
+        {<NN.*|JJ>*<NN.*>}  # Nouns and Adjectives, terminated with Nouns
+     NP:
+        {<NBAR>}
+        {<NBAR><IN><NBAR>}  # Above, connected with in/of/etc...
+    """
+    postagged_sentence = nltk.pos_tag(sentence.split())
+    nltk_rexp_parser = nltk.RegexpParser(grammar)
+    chunks_sentence = nltk_rexp_parser.parse(postagged_sentence)
+
+    extract_noun = []
+    extract_noun_score = {}
+    for subtree in chunks_sentence.subtrees():
+        # print(subtree)
+        # print(subtree.label())
+        # print(' '.join((e[0] for e in list(subtree))))
+        if subtree.label().startswith('NBAR'):
+            if len(' '.join((e[0] for e in list(subtree)))) > 1:
+                noun = ' '.join((e[0] for e in list(subtree)))
+                if re.search(r"\s", noun):
+                    extract_noun.append(noun)
+                    # extract_noun_score[noun] = 0.75
+                    if in_dict(extract_noun_score, noun) == False:
+                        extract_noun_score[noun] = 0.75
+                    else:
+                        extract_noun_score[noun] += 0.75
+    print(extract_noun_score)
+    return sorted_dict(extract_noun_score)
+
+
+def expect_multi_noun_text_ko(sentence):
     # Define a chunk grammar, or chunking rules, then chunk
 
     grammar = """
@@ -62,7 +97,7 @@ def expect_multi_noun_text(sentence):
     복합명사2: {<SN><NN.*>*<X.*>?}
     복합명사3: {<NNG>*<X.*>?}
     복합명사4: {<N.*>*<Suffix>?}   
- 
+
 
     동사구: {<NP\+VCP\+EF>}
     동사구: {<NP><VCP\+EF>}
@@ -91,7 +126,7 @@ def expect_multi_noun_text(sentence):
     return sorted_dict(extract_noun_score)
 
 
-def expect_single_noun_text(sentence):
+def expect_single_noun_text_en(sentence):
     # Define a chunk grammar, or chunking rules, then chunk
 
     grammar = """
@@ -134,8 +169,8 @@ def cleaning_multi_noun(multi_noun_list=[], multi_noun_list_score=[], cleaning_c
     cleaning_multi_noun_result = []
     cleaning_multi_noun_result_score = {}
 
-    cleaning_multi_noun_result_score
     for multi_noun in multi_noun_list:
+        multi_noun = re.sub("[\s]+", " ", multi_noun)
         isOnlyEngNum = re.sub('[a-zA-Z0-9]', '', multi_noun)
         # print(multi_noun)
         if len(isOnlyEngNum.strip()) == 0:
@@ -156,30 +191,20 @@ def cleaning_multi_noun(multi_noun_list=[], multi_noun_list_score=[], cleaning_c
 
         # print(multi_noun)
         multi_noun_space_splitter = multi_noun.split(" ")
-        if len(multi_noun_space_splitter) >= 2:
-            # print(multi_noun)
+        if len(multi_noun_space_splitter) >= 1:
+            # print(multi_noun_space_splitter)
             candidate_multi_noun = ""
             for index in range(cleaning_count):
-
+                # print(multi_noun_space_splitter)
                 if len(multi_noun_space_splitter[-1]) == 1:
                     candidate_multi_noun = ' '.join(multi_noun_space_splitter[:-1])
                 elif len(multi_noun_space_splitter[0]) == 1:
                     candidate_multi_noun = ' '.join(multi_noun_space_splitter[1:])
-
+                else:
+                    candidate_multi_noun = ' '.join(multi_noun_space_splitter)
                 multi_noun_space_splitter = candidate_multi_noun.split(" ")
 
-            # print(candidate_multi_noun)
-
-            for index in range(cleaning_count):
-                multi_noun_space_splitter = candidate_multi_noun.split(" ")
-                if len(multi_noun_space_splitter[0]) == 1:
-                    candidate_multi_noun = ' '.join(multi_noun_space_splitter[1:])
-                elif len(multi_noun_space_splitter[-1]) == 1:
-                    candidate_multi_noun = ' '.join(multi_noun_space_splitter[:-1])
-
-                candidate_multi_noun = re.sub("[\s]+", " ", candidate_multi_noun)
-
-            # print(candidate_multi_noun)
+                # print(candidate_multi_noun)
 
             if candidate_multi_noun.strip() != '':
                 if re.search(r"\s", candidate_multi_noun):
@@ -203,9 +228,8 @@ def cleaning_multi_noun(multi_noun_list=[], multi_noun_list_score=[], cleaning_c
                         cleaning_multi_noun_result_score[candidate_multi_noun] = 0.75
                     else:
                         cleaning_multi_noun_result_score[candidate_multi_noun] += 0.75
-
+    # print(cleaning_multi_noun_result_score)
     return sorted_dict(cleaning_multi_noun_result_score)
-
 
 def krwordrank_noun(sentence_list=[], min_count=5, max_length=10, beta=0.85, max_iter=10, verbose=False):
     krword_rank_noun = []
@@ -316,11 +340,22 @@ def multi_noun_score_add(multi_noun_score, krword_rank_once_noun_score):
                     multi_noun_score[multi_noun] = 0
                 elif len(temp_multi_noun.replace(temp_krword_noun, "")) < len(temp_multi_noun):
                     multi_noun_score[multi_noun] += krword_rank_once_noun_score[krword_noun]
+                else :
+                    tem_add_noun_score[krword_noun] = 0.75
+
             else:
                 if len(temp_krword_noun.replace(temp_multi_noun, "")) < len(temp_krword_noun):
                     multi_noun_score[multi_noun] += krword_rank_once_noun_score[krword_noun]
+                else:
+                    tem_add_noun_score[krword_noun] = 0.75
+
     multi_noun_score.update(tem_add_noun_score)
-    return sorted_dict(multi_noun_score)
+
+    temp_krword_noun, _ = sorted_dict(multi_noun_score)
+    if len(temp_krword_noun) == 0:
+        return sorted_dict(krword_rank_once_noun_score)
+    else:
+        return sorted_dict(multi_noun_score)
 
 
 def text_in_mult_noun_finder(multi_noun, multi_noun_score, text):
@@ -388,11 +423,12 @@ def extract_mecab_multi_noun(text, item_counter=0):
         for sentence in sentence_list:
             sentence = sentence.strip()
             if sentence:
-                first_multi_noun_list, _ = expect_multi_noun_text(sentence)
-                first_single_noun_list, _ = expect_single_noun_text(sentence)
+                first_multi_noun_list, _ = expect_multi_noun_text_ko(sentence)
+                first_single_noun_list, _ = expect_single_noun_text_en(sentence)
 
                 first_multi_noun_list.extend(first_single_noun_list)
-                # print(first_multi_noun_list)
+                print("f", first_single_noun_list)
+                print("f", first_multi_noun_list)
                 second_multi_noun_list, second_multi_noun_list_score = cleaning_multi_noun(first_multi_noun_list,
                                                                                            cleaning_count=2)
                 # second_multi_noun_list, second_multi_noun_list_score = check_stopword(second_multi_noun_list, second_multi_noun_list_score)
@@ -407,14 +443,15 @@ def extract_mecab_multi_noun(text, item_counter=0):
         krword_rank_once_noun, krword_rank_once_noun_score = krwordrank_noun(sentence_list=sentence_list,
                                                                              min_count=2)
 
-    # print(multi_noun, multi_noun_score)
-    # print(krword_rank_noun, krword_rank_noun_score)
-    # print(krword_rank_once_noun, krword_rank_once_noun_score)
+    print(multi_noun, multi_noun_score)
+    print(krword_rank_noun, krword_rank_noun_score)
+    print(krword_rank_once_noun, krword_rank_once_noun_score)
 
     multi_noun.extend(krword_rank_noun)
     multi_noun_score.update(krword_rank_noun_score)
+
     # multi_noun = multi_noun.extend(krword_rank_once_noun)
-    # print(multi_noun, multi_noun_score)
+    print(multi_noun, multi_noun_score)
 
     # print("-" * 100)
     multi_noun, multi_noun_score = check_stopword(multi_noun, multi_noun_score)
@@ -433,8 +470,9 @@ def extract_mecab_multi_noun(text, item_counter=0):
 
     multi_noun, multi_noun_score = check_stopword(multi_noun, multi_noun_score)
 
-    # print("0" * 100)
-    # print(multi_noun_score)
+    print("0" * 100)
+    print(multi_noun_score)
+    print(krword_rank_once_noun_score)
     multi_noun, multi_noun_score = multi_noun_score_add(multi_noun_score,
                                                         krword_rank_once_noun_score)
 
@@ -571,3 +609,5 @@ if __name__ == '__main__':
     #     "[6·17 대책]3억 넘는 집사면 전세대출 회수…법인 주담대는 \'금지\'(종합) ∥ \n \n \n\n\n\n// flash 오류를 우회하기 위한 함수 추가\nfunction _flash_removeCallback() {}\n\n \n \"주택구입시 전입·처분 요건 강화\"\r\"보금자리론 대출자, 실거주 유지 의무\"\r\"HUG 전세대출보증한도 2억으로 낮춰\"[서울=뉴시스]김명원 기자 = 김현미 국토교통부 장관이 17일 오전 서울 종로구 정부서울청사 합동브리핑실에서 갭투자 규제를 핵심 내용으로 한 문재인 정부 21번째 부동산대책을 발표하고 있다. 2020.06.17. kmx1105@newsis.com[서울=뉴시스] 정옥주 기자 = 정부가 갭투자(전세 낀 주택 매입) 차단을 위해 주택담보대출 요건과 전세자금대출보증 이용 제한을 강화하기로 했다. 또 법인을 활용한 투기 수요 근절을 위해 주택 매매·임대사업자의 주택담보대출을 전면 금지키로 했다.기획재정부와 국토교통부, 금융위원회 등 정부부처는 17일 정부서울청사에서 \'주택시장 안정을 위한 관리방안\' 브리핑을 열고 이 같은 방안을 발표했다.이에 따르면 정부는 투기지역·투기과열지구 내 시가 3억원 초과 아파트를 신규 구입하는 경우도 전세대출 보증 제한 대상에 추가하기로 했다. 전세대출을 받은 후 투기지역·투기과열지구 내 3억원 초과 아파트를 구입하는 경우 전세대출을 즉시 회수한다.종전에는 시가 9억원 초과 주택 보유자에 대해 전세대출 보증을 제한하고, 전세대출을 받은 후 9억원 초과 주택을 구입하면 대출을 즉시 회수했다.하지만 보증금을 승계해 매수하는 갭 투자 비중이 계속해서 증가 추세를 보이자, 이를 차단하고 실수요를 보호하기 위해 주담대 실수요 요건과 전세자금대출 규제 강화라는 카드를 꺼내들었다. 실제로 서울 지역의 갭 투자 비중은 올해 1월 48.4%에서 지난 5월 52.4%로 높아졌다. 특히 강남 4구의 경우 같은 기간 57.5%에서 72.7%로 뛰어올랐다.다만 12·16 대책 등 기존 규제사례에서 인정된 불가피한 실수요 등에 대해서는 예외를 인정키로 했다. ▲직장 이동·자녀 교육·부모 봉양 등 실수요 목적 ▲시·군간 이동할 경우 ▲전셋집과 구입주택 모두에서 전세로 실거주할 경우 등이다.규제지역 내 주택 구입을 위해 주담대를 받는 경우 전입과 처분 요건도 강화했다.현재는 무주택자가 투기지역·투기과열지구 내 시가 9억원 초과 주택 구입을 위해 주담대를 받으면, 1년내 전입(조정대상지역은 2년) 의무를 부과하고 있다. 그러나 앞으로는 전 규제지역 내 주택 구입을 위해 주담대를 받는 경우 주택가격과 관계없이 6개월내 전입 의무가 부과된다. 1주택자들은 전 규제지역 내 주택구입을 위해 주담대를 받는 경우 6개월내 기존주택을 처분하고, 신규주택 전입해야 한다.전산개발 및 준비 등을 감안해 오는 7월1일부터 시행된다. 다만 행정지도 시행 전 주택매매계약을 체결하고 계약금을 이미 납부한 사실을 증명한 차주, 대출 신청접수를 완료한 차주 등에 대해서는 종전 규정을 적용한다.단 가계약의 경우 종전 규정이 적용되지 않는다.6개월 산정시점은 주택담보대출 실행일부터다. 단 중도금·이주비 대출의 경우 신규 주택 소유권 이전 등기일로부터 6개월이다.만약 전입하지 않으면 기한의 이익이 상실돼 대출을 상환해야 하며, 차주는 향후 3년간 주택관련 대출을 받는 것이 제한된다.보금자리론 대출자들에는 실거주 유지 의무가 부과된다. 지금은 보금자리론 이용 차주에게 전입 의무는 부과되지 않고 있다. 그러나 주택금융공사 내규 개정 시행일인 다음달 1일 이후 보금자리론 신청 분부터 3개월 내 전입 및 1년 이상 실거주 유지 의무가 부과된다. 이를 위반하면 대출금이 회수된다.보금자리론 대출자는 대출실행 시점 또는 대출 실행 후 3개월 내에 전입 후 \'전입세대열람원\'을 은행에 제출해야 한다. 주택금융공사는 대출실행 후 일정 기간이 지나면 전입 여부를 조사할 수 있으며, 약정을 위반해 전출한 게 확인된 경우 기한이익 상실 조치를 한다.주택도시보증공사(HUG)의 전세대출 보증한도는 2억원으로 축소된다. 현재 수도권 4억원, 지방 3억2000만원인 HUG의 전세대출 보증한도를 1주택자에 한해 주택금융공사 수준인 2억원으로 낮춘다. 이는 현재 전세대출 보증한도가 보증기관별로 차이가 있어 1주택자의 갭 투자 용도로 활용되고 있다는 지적에 따른 것이다. HUG 내규 개정 시행일 이후 전세대출 신규 신청분부터 적용될 예정이다.이세훈 금융위 금융정책국장은 \"전세대출 규제는 주금공과 HUG 등 공적보증에 대해 적용되며 SGI서울보증에도 협조를 요청할 예정\"이라고 말했다.부동산 법인의 투기수요를 막기 위해 주택 매매·임대사업자의 주담대는 전면 금지키로 했다.이는 건물과 토지 등 부동산을 구입한 후 재판매하거나 임대하는 부동산 매매업·임대업 법인이 빠르게 증가하는 것에 대응하기 위한 조치다. 법인이 아파트를 매수한 비중은 지난 2017년 1%에서 지난해 3%로 증가했으며, 특히 인천·청주 등 시장 과열지역에서 매수비중이 큰 폭으로 늘었다.이에 따라 다음달 1일부터 모든 지역 주택 매매·임대사업자에 대한 주담대가 금지된다. 기존에는 규제지역 내 주택 매매·임대사업자의 주담대는 LTV(담보인정비율) 20%~50%를 적용했고, 비규제지역은 규제가 없었다.시설자금뿐 아니라 운전자금용으로도 주담대를 받을 수 없다. 단 임차인 보호를 위해 주택 매매·임대사업자가 올해 7월1일 전까지 취득한 주택을 담보로 하는 임차보증금 반환 목적 대출은 허용하기로 했다.이 국장은 \"이번 대책은 법인거래와 갭투자가 시장불안 요인으로 작용하고 있다는 점에 주목했다\"며 \"실거주를 강화한 것으로, 거래관행으로 볼 때 이사가는 집을 정해놓고 매매하기 때문에 실수요를 과도하게 제한하는 것은 아니라고 판단된다\"고 말했다.☞공감언론 뉴시스channa224@newsis.com▶ 네이버에서 뉴시스 구독하기▶ K-Artprice, 유명 미술작품 가격 공개▶ 뉴시스 빅데이터 MSI 주가시세표 바로가기<ⓒ 공감언론 뉴시스통신사. 무단전재-재배포 금지>\n \n")
     # print('---')
     # print(a)
+print(expect_multi_noun_text_en(' Preface The Spring for Apache Kafka project applies core Spring concepts to the development of Kafka '))
+
