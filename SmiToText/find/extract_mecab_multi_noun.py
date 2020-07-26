@@ -58,7 +58,7 @@ def check_en_stopword(word):
     stop_words = set(stopwords.words('english'))
     # print(stop_words)
     stop_words.add('th')
-    if word in stop_words:
+    if str(word).lower() in stop_words:
         return True
     else:
         return False
@@ -479,8 +479,8 @@ def extract_mecab_multi_noun(text, item_counter=0):
 
     # print(multi_noun, multi_noun_score)
     multi_noun, multi_noun_score = remove_last_one_char(multi_noun, multi_noun_score)
-    krword_rank_noun, krword_rank_noun_score = remove_last_one_char(krword_rank_noun, krword_rank_noun_score)
-    krword_rank_noun, krword_rank_noun_score = remove_last_one_char(krword_rank_noun, krword_rank_noun_score)
+    # krword_rank_noun, krword_rank_noun_score = remove_last_one_char(krword_rank_noun, krword_rank_noun_score)
+    # krword_rank_noun, krword_rank_noun_score = remove_last_one_char(krword_rank_noun, krword_rank_noun_score)
 
     # print(multi_noun, multi_noun_score)
     # print(krword_rank_noun, krword_rank_noun_score)
