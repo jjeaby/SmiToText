@@ -530,57 +530,13 @@ def extract_file_multi_noun(input, output, item_counter=0):
         if not line:
             break;
 
-        line = line.strip()
-
-        for line_array in line.split("\n"):
-            line_array = line_array.strip()
-
-            line_array_multi_noun_score = {}
-
-            line_array = re.sub(r'[\w.-]+@[\w.-]+.\w+', '', line_array)
-            line_array = re.sub(
-                r'(http|ftp|https)://([\w+?\.\w+])+([a-zA-Z0-9\~\!\@\#\$\%\^\&\*\(\)_\-\=\+\\\/\?\.\:\;\'\,]*)?', '',
-                line_array)
-
-            multi_noun_list, multi_noun_list_score = extract_mecab_multi_noun(line_array, item_counter=item_counter)
-
-            if len(multi_noun_list):
-                for index, word in enumerate(multi_noun_list):
-                    if Util().check_email(word):
-                        continue
-                    else:
-                        add_flag = True
-                        for char in word:
-                            if char in ["'", "`", ",", "'", "\"", "|", "!", "@", "#", "$", "%", "^", "&", "*", "(",
-                                        ")",
-                                        "-", "_", "=", "+", "<", ">", ".", ";", ":",
-                                        "ㄱ", "ㄴ", "ㄲ", "ㅂ", "ㅃ", "ㅈ", "ㅉ", "ㄷ", "ㄸ", "ㄱ", "ㅁ", "ㅇ", "ㄹ", "ㅎ", "ㅅ",
-                                        "ㅆ",
-                                        "ㅍ", "ㅊ", "ㅌ", "ㅋ", "ㅛ", "ㅕ", "ㅑ", "ㅐ", "ㅔ", "ㅗ", "ㅓ", "ㅏ", "ㅣ", "ㅠ", "ㅜ",
-                                        "ㅡ", " "]:
-                                add_flag = False
-
-                        if word == '기자' or word == str(date.today().day) + '일':
-                            add_flag = False
-
-                        if check_en_stopword(word):
-                            add_flag = False
-
-                        if add_flag:
-                            word_score = {word: multi_noun_list_score[word]}
-                            line_array_multi_noun_score.update(word_score)
-                        # print(line_number, word)
-
-        _, line_array_multi_noun_score_sorted = sorted_dict(line_array_multi_noun_score)
+        _, line_array_multi_noun_score_sorted = extract_multi_noun(line, item_counter=item_counter)
         output_file.write(str(line_array_multi_noun_score_sorted) + os.linesep)
-        print(line_number, line_array_multi_noun_score)
+        print(line_number, line_array_multi_noun_score_sorted)
         line_number += 1
 
 
-
-
 def extract_multi_noun(text, item_counter=0):
-
     text = text.strip()
 
     for text_array in text.split("\n"):
@@ -611,7 +567,9 @@ def extract_multi_noun(text, item_counter=0):
                                     "ㅡ", " "]:
                             add_flag = False
 
-                    if word == '기자' or word == str(date.today().day) + '일':
+                    if word == '기자' or word == str(date.today().day) + '일' \
+                            or word.strip() == "" \
+                            :
                         add_flag = False
 
                     if check_en_stopword(word):
