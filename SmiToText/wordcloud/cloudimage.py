@@ -65,8 +65,8 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=str, required=True, default='', help='Word Cloud Image File')
     parser.add_argument('--font', type=str, required=False, default='', help='Word Cloud Font File')
     parser.add_argument('--lang', type=str, required=False, default='en', help='Lang Check( en, ko ), defalut en')
-    parser.add_argument('--image', type=str, required=False, default='', help='Shape Image File')
     parser.add_argument('--type', type=str, required=False, default='text', help='Select Counter or Text')
+    parser.add_argument('--image', type=str, required=False, default='', help='Shape Image File')
 
     args = parser.parse_args()
     if not args.input:

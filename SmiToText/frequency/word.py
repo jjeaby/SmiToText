@@ -7,6 +7,7 @@ from SmiToText.tokenizer import nltk
 
 
 
+
 def word_tags(text):
     count = Counter([text.strip()])
     return count

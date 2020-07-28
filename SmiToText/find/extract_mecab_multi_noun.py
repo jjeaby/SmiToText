@@ -43,6 +43,7 @@ all_stop_word = ['가령', '각각', '각자', '각종', '같다', '같이', '�
                  '어떻', '당시', '그러면서', '받아보',
                  '가진', '것이',
                  '네이버연합뉴스',
+                 '오늘', '내일', '모레', '어제', '그제', '오전', '오후',
                  '구독클릭', '부여스마트', '공감언론', '소재나이스', 'channa224', 'com▶['
                  ]
 
@@ -534,7 +535,7 @@ def extract_file_multi_noun(input, output, item_counter=0):
         _, line_array_multi_noun_score_sorted = extract_multi_noun(line, item_counter=item_counter)
         line_array_multi_noun_score_sorted_json = json.dumps(line_array_multi_noun_score_sorted, ensure_ascii=False)
         output_file.write(str(line_array_multi_noun_score_sorted_json) + os.linesep)
-        print(line_number, line_array_multi_noun_score_sorted)
+        print(line_number, line_array_multi_noun_score_sorted_json)
         line_number += 1
 
 
