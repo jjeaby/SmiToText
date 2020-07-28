@@ -4,6 +4,7 @@ import itertools
 import os
 import re
 from datetime import date
+import json
 
 import nltk
 from konlpy.tag import Mecab
@@ -531,7 +532,8 @@ def extract_file_multi_noun(input, output, item_counter=0):
             break;
 
         _, line_array_multi_noun_score_sorted = extract_multi_noun(line, item_counter=item_counter)
-        output_file.write(str(line_array_multi_noun_score_sorted) + os.linesep)
+        line_array_multi_noun_score_sorted_json = json.dumps(line_array_multi_noun_score_sorted, ensure_ascii=False)
+        output_file.write(str(line_array_multi_noun_score_sorted_json) + os.linesep)
         print(line_number, line_array_multi_noun_score_sorted)
         line_number += 1
 
