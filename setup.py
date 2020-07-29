@@ -30,8 +30,10 @@ install_requires = [
 setup(
     name='SmiToText',
     version='0.1605',
-    py_modules = ['SmiToText'],
+    py_modules = ['SmiToText', 'SmiToText.font'],
     packages=find_packages(exclude=['tests']),
+    package_dir={'SmiToText': 'SmiToText'},
+    package_data={'SmiToText': ['font/*.ttf']},
     install_requires=install_requires,
     include_package_data=True,
     url='https://github.com/jjeaby/SmiToText',

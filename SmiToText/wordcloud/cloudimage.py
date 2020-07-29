@@ -67,6 +67,7 @@ if __name__ == '__main__':
     parser.add_argument('--lang', type=str, required=False, default='en', help='Lang Check( en, ko ), defalut en')
     parser.add_argument('--type', type=str, required=False, default='text', help='Select Counter or Text')
     parser.add_argument('--image', type=str, required=False, default='', help='Shape Image File')
+    parser.add_argument('--exclude', type=str, required=False, default='', help='Word Cloud Exclude File')
 
     args = parser.parse_args()
     if not args.input:
@@ -83,9 +84,21 @@ if __name__ == '__main__':
     lang = str(args.lang)
     image = str(args.image)
     type = str(args.type)
+    exclude = str(args.exclude)
+
+    exclude_word = []
 
     if not font:
         font = default_font_path
+
+
+    if exclude:
+        with open(exclude, encoding='utf-8', mode='r') as exclude_file:
+            lines = exclude_file.readlines()
+            for line in lines:
+                exclude_word.append(line)
+
+
 
     print(font)
     countText = Counter()
@@ -94,31 +107,17 @@ if __name__ == '__main__':
             lines = input_file.readlines()
             tempCountText = Counter()
             for line in lines:
-                # if lang.lower() == 'en':
-                #     tempCountText = nltk_word_tags(line)
-                # elif lang.lower() == 'ko':
-                #     tempCountText = mecab_word_tags(line)
-                tempCountText = word_tags(line)
-                countText = countText + tempCountText
-        # print(countText)
+                if line not in exclude_word :
+                    tempCountText = word_tags(line)
+                    countText = countText + tempCountText
     else:
-        # with open(input, encoding='utf-8', mode='r') as input_file:
-        #     lines = input_file.readlines()
-        #     tempCountText = Counter()
-        #     for line in lines:
-        #         print(line)
-        #         tempCountText = Counter(json.load(line))
-        #         countText = countText + tempCountText
-
-        # with open(input, encoding='utf-8', mode='r') as input_file:
-        #     lines = input_file.readlines()
-        #     for line in lines:
-        #         print(lines)
-        #         tempCountText = Counter(json.loads(line.replace("'", "\"")))
-        #         countText = countText + tempCountText
-
         with open(input, encoding='utf-8', mode='r') as json_file:
             countText = json.load(json_file)
-        print(Counter(countText))
+
+            if len(countText) > 0 :
+                for word in list(countText.keys()):
+                    if len(exclude) > 0 :
+                        if word not in exclude :
+                            del countText[word]
 
     wordcloud_gen(countText, output, font_path=font, image=image)

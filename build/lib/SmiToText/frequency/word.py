@@ -6,6 +6,12 @@ from SmiToText.tokenizer import mecab
 from SmiToText.tokenizer import nltk
 
 
+
+
+def word_tags(text):
+    count = Counter([text.strip()])
+    return count
+
 def nltk_word_tags(text):
     nltkSentence = nltk.nltkTokenizer(text)
     nltkSentence = nltkSentence.split(" ")
