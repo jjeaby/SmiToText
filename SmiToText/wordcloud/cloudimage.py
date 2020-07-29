@@ -57,7 +57,7 @@ def wordcloud_gen(keywords, save_path, width=1000, height=1000, font_path='', im
 if __name__ == '__main__':
     texts = '이것 은 예문 입니다. 여러분 의 문장을 넣 으세요'
     # keywords = {'이것': 5, '예문': 3, '단어': 5, '빈도수': 3}
-    default_font_path = __ROOT_DIR__ + os.sep + 'data' + os.sep + 'font' + os.sep + 'Goyang.ttf'
+    default_font_path = __ROOT_DIR__ + os.sep + 'SmiToText' + os.sep + 'font' + os.sep + 'Goyang.ttf'
 
     # print(default_font_path)
     parser = argparse.ArgumentParser(description="Word Cloud Generator")
@@ -87,6 +87,7 @@ if __name__ == '__main__':
     if not font:
         font = default_font_path
 
+    print(font)
     countText = Counter()
     if type.lower() == 'text':
         with open(input, encoding='utf-8', mode='r') as input_file:
