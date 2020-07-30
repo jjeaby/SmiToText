@@ -91,15 +91,12 @@ if __name__ == '__main__':
     if not font:
         font = default_font_path
 
-
     if exclude:
         with open(exclude, encoding='utf-8', mode='r') as exclude_file:
             lines = exclude_file.readlines()
             for line in lines:
-                if len(line.strip()) > 0 :
+                if len(line.strip()) > 0:
                     exclude_word.append(line.strip())
-
-
 
     print(font)
     countText = Counter()
@@ -108,18 +105,23 @@ if __name__ == '__main__':
             lines = input_file.readlines()
             tempCountText = Counter()
             for line in lines:
-                if line not in exclude_word :
+                line = line.strip()
+                if line not in exclude_word:
                     tempCountText = word_tags(line)
                     countText = countText + tempCountText
+                # else:
+                #     print(line)
     else:
         with open(input, encoding='utf-8', mode='r') as json_file:
             countText = json.load(json_file)
 
-            if len(countText) > 0 :
+            if len(countText) > 0:
                 for word in list(countText.keys()):
-                    if len(exclude_word) > 0 :
+                    word = word.strip()
+                    if len(exclude_word) > 0:
                         for exclude_word_item in exclude_word:
-                            if word.find(exclude_word_item) >= 0  :
+                            exclude_word_item = exclude_word_item.strip()
+                            if word.find(exclude_word_item) >= 0:
                                 del countText[word]
                                 # print(exclude_word_item, word)
                                 break
