@@ -96,7 +96,8 @@ if __name__ == '__main__':
         with open(exclude, encoding='utf-8', mode='r') as exclude_file:
             lines = exclude_file.readlines()
             for line in lines:
-                exclude_word.append(line)
+                if len(line.strip()) > 0 :
+                    exclude_word.append(line.strip())
 
 
 
@@ -116,8 +117,11 @@ if __name__ == '__main__':
 
             if len(countText) > 0 :
                 for word in list(countText.keys()):
-                    if len(exclude) > 0 :
-                        if word not in exclude :
-                            del countText[word]
+                    if len(exclude_word) > 0 :
+                        for exclude_word_item in exclude_word:
+                            if word.find(exclude_word_item) >= 0  :
+                                del countText[word]
+                                # print(exclude_word_item, word)
+                                break
 
     wordcloud_gen(countText, output, font_path=font, image=image)
