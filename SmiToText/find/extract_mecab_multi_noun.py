@@ -133,7 +133,7 @@ def expect_multi_noun_text_ko(sentence):
                 if re.search(r"\s", noun):
                     extract_noun.append(noun)
                     # extract_noun_score[noun] = 0.75
-                    if in_dict(extract_noun_score, noun) == False:
+                    if not in_dict(extract_noun_score, noun):
                         check_capitalize_score = 1000 if len(re.findall('[A-Z]+', noun)) > 0 else 0
                         extract_noun_score[noun] = 0.75 + check_capitalize_score
                     else:
