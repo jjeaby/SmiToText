@@ -93,7 +93,7 @@ def expect_multi_noun_text_en(sentence):
                 extract_noun.append(noun)
                 # extract_noun_score[noun] = 0.75
                 if not in_dict(extract_noun_score, noun):
-                    check_capitalize_score = 1000 * len(re.findall('[A-Z]+', noun))
+                    check_capitalize_score = 1000 * len(re.findall('[A-Z]+', noun)) / len(noun.replace(" ", ""))
                     extract_noun_score[noun] = 0.75 + check_capitalize_score
                 else:
                     extract_noun_score[noun] += 0.75
@@ -135,7 +135,7 @@ def expect_multi_noun_text_ko(sentence):
                     extract_noun.append(noun)
                     # extract_noun_score[noun] = 0.75
                     if not in_dict(extract_noun_score, noun):
-                        check_capitalize_score = 1000 * len(re.findall('[A-Z]+', noun))
+                        check_capitalize_score = 1000 * len(re.findall('[A-Z]+', noun)) / len(noun.replace(" ", ""))
                         extract_noun_score[noun] = 0.75 + check_capitalize_score
                     else:
                         extract_noun_score[noun] += 0.75
@@ -177,7 +177,7 @@ def expect_single_noun_text_ko(sentence):
                     extract_noun.append(noun)
                     # extract_noun_score[noun] = 0.75
                     if not in_dict(extract_noun_score, noun):
-                        check_capitalize_score = 1000 * len(re.findall('[A-Z]+', noun))
+                        check_capitalize_score = 1000 * len(re.findall('[A-Z]+', noun)) / len(noun.replace(" ", ""))
                         extract_noun_score[noun] = 0.75 + check_capitalize_score
                     else:
                         extract_noun_score[noun] += 0.75
@@ -199,7 +199,8 @@ def cleaning_multi_noun(multi_noun_list=[], multi_noun_list_score=[], cleaning_c
             cleaning_multi_noun_result.append(multi_noun)
             if len(multi_noun_list_score) == 0:
                 if not in_dict(cleaning_multi_noun_result_score, multi_noun):
-                    check_capitalize_score = 1000 * len(re.findall('[A-Z]+', multi_noun))
+                    check_capitalize_score = 1000 * len(re.findall('[A-Z]+', multi_noun)) / len(
+                        multi_noun.replace(" ", ""))
                     cleaning_multi_noun_result_score[multi_noun] = 0.75 + check_capitalize_score
                 else:
                     cleaning_multi_noun_result_score[multi_noun] += 0.75
@@ -235,7 +236,8 @@ def cleaning_multi_noun(multi_noun_list=[], multi_noun_list_score=[], cleaning_c
 
                     if len(multi_noun_list_score) == 0:
                         if not in_dict(cleaning_multi_noun_result_score, candidate_multi_noun):
-                            check_capitalize_score = 1000 * len(re.findall('[A-Z]+', candidate_multi_noun))
+                            check_capitalize_score = 1000 * len(re.findall('[A-Z]+', candidate_multi_noun)) / len(
+                                candidate_multi_noun.replace(" ", ""))
                             cleaning_multi_noun_result_score[candidate_multi_noun] = 0.75 + check_capitalize_score
                         else:
                             cleaning_multi_noun_result_score[candidate_multi_noun] += 0.75
@@ -248,7 +250,8 @@ def cleaning_multi_noun(multi_noun_list=[], multi_noun_list_score=[], cleaning_c
                                 candidate_multi_noun]
                 else:
                     if not in_dict(cleaning_multi_noun_result_score, candidate_multi_noun):
-                        check_capitalize_score = 1000 * len(re.findall('[A-Z]+', candidate_multi_noun) )
+                        check_capitalize_score = 1000 * len(re.findall('[A-Z]+', candidate_multi_noun)) / len(
+                            candidate_multi_noun.replace(" ", ""))
                         cleaning_multi_noun_result_score[candidate_multi_noun] = 0.75 + check_capitalize_score
                     else:
                         cleaning_multi_noun_result_score[candidate_multi_noun] += 0.75
@@ -366,14 +369,16 @@ def multi_noun_score_add(multi_noun_score, krword_rank_once_noun_score):
                 elif len(temp_multi_noun.replace(temp_krword_noun, "")) < len(temp_multi_noun):
                     multi_noun_score[multi_noun] += krword_rank_once_noun_score[krword_noun]
                 else:
-                    check_capitalize_score = 1000 * len(re.findall('[A-Z]+', krword_noun))
+                    check_capitalize_score = 1000 * len(re.findall('[A-Z]+', krword_noun)) / len(
+                        krword_noun.replace(" ", ""))
                     tem_add_noun_score[krword_noun] = 0.75 + check_capitalize_score
 
             else:
                 if len(temp_krword_noun.replace(temp_multi_noun, "")) < len(temp_krword_noun):
                     multi_noun_score[multi_noun] += krword_rank_once_noun_score[krword_noun]
                 else:
-                    check_capitalize_score = 1000 * len(re.findall('[A-Z]+', krword_noun))
+                    check_capitalize_score = 1000 * len(re.findall('[A-Z]+', krword_noun)) / len(
+                        krword_noun.replace(" ", ""))
                     tem_add_noun_score[krword_noun] = 0.75 + check_capitalize_score
 
     multi_noun_score.update(tem_add_noun_score)
