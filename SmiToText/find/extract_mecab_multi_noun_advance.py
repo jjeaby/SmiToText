@@ -378,7 +378,7 @@ def upper_char_add_score(multi_noun_counter):
     for multi_noun, count in multi_noun_counter.items():
         # print("--")
         if len(re.findall('[A-Z]+', multi_noun)) > 0 :
-            check_capitalize_multi_noun_socre = 1000 * len(re.findall('[A-Z]+', multi_noun)) / len(
+            check_capitalize_multi_noun_socre = 10000 * len(re.findall('[A-Z]+', multi_noun)) / len(
                 multi_noun.replace(" ", ""))
             result_multi_noun[multi_noun] = count + check_capitalize_multi_noun_socre
     result_multi_noun = result_multi_noun + multi_noun_counter
