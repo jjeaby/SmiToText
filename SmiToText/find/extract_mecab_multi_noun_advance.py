@@ -276,22 +276,21 @@ def krwordrank_noun(sentence_list=[], min_count=5, max_length=10, beta=0.85, max
         return krword_rank_noun_counter
 
 
-def remove_stopword(multi_noun, multi_noun_score, stop_word=[]):
+def remove_stopword(multi_noun_counter, stop_word=[]):
+    result_multi_noun_count = Counter({})
+
     if len(stop_word) == 0 or stop_word == None:
-        stop_word = all_stop_word
+        stop_word = copy.deepcopy(all_stop_word)
+    stop_word.extend(stopwords.words('english'))
 
-    check_multi_noun = []
-    check_multi_noun_score = {}
+    for multi_noun, count in multi_noun_counter.items():
+        if multi_noun not in stop_word \
+                and not Util().is_int(multi_noun) \
+                and not str(multi_noun).endswith('니다') \
+                and not str(multi_noun).endswith('이다'):
+            result_multi_noun_count.update({multi_noun: count})
 
-    for noun in multi_noun:
-        if noun not in stop_word \
-                and not Util().is_int(noun) \
-                and not str(noun).endswith('니다') \
-                and not str(noun).endswith('이다'):
-            check_multi_noun.append(noun)
-            check_multi_noun_score[noun] = multi_noun_score[noun]
-
-    return sorted_dict(check_multi_noun_score)
+    return result_multi_noun_count
 
 
 def check_stopword(multi_noun_counter, stop_word=[]):
@@ -341,12 +340,50 @@ def sorted_dict(multi_noun_score):
     return ret_check_multi_noun, ret_check_multi_noun_score
 
 
-def multi_noun_score_check(multi_noun_counter):
-    tem_add_noun_score = {}
-    for multi_noun in multi_noun_counter:
+def multi_noun_remove_special_char(multi_noun_counter):
+    result_multi_noun = Counter({})
+
+    for multi_noun, count in multi_noun_counter.items():
         temp_multi_noun = re.sub("[\s]+", " ", multi_noun)
-        # print(temp_multi_noun)
-    return multi_noun_counter
+        if len(temp_multi_noun) > 1:
+            temp_multi_noun = temp_multi_noun[0: -1] + re.sub('[-=+,#/\?:^$.@*\"※~&%ㆍ!”』\\‘|\(\)\[\]\<\>`\'…》\^\)\(▶]',
+                                                              '', temp_multi_noun[-1])
+            temp_multi_noun = re.sub('[-=+,#/\?:^$.@*\"※~&%ㆍ!”』\\‘|\(\)\[\]\<\>`\'…》\^\)\(▶]', '',
+                                     temp_multi_noun[0]) + temp_multi_noun[1:]
+        result_multi_noun.update({temp_multi_noun: count})
+    return result_multi_noun
+
+
+def with_word_add_score(multi_noun_counter):
+    add_multi_noun_score = Counter({})
+    for multi_noun_1, count_1 in multi_noun_counter.items():
+        # print("--")
+        for multi_noun_2, count_2 in multi_noun_counter.items():
+            if multi_noun_1 == multi_noun_2:
+                continue
+            else:
+                # print(multi_noun_1, multi_noun_2)
+                if len(multi_noun_1) > len(multi_noun_2):
+                    if multi_noun_1.find(multi_noun_2):
+                        add_multi_noun_score.update({multi_noun_1: count_2})
+                else:
+                    if multi_noun_2.find(multi_noun_1):
+                        add_multi_noun_score.update({multi_noun_2: count_1})
+    result_multi_noun_counter = multi_noun_counter + add_multi_noun_score
+    return result_multi_noun_counter
+
+
+def upper_char_add_score(multi_noun_counter):
+    result_multi_noun = Counter({})
+    for multi_noun, count in multi_noun_counter.items():
+        # print("--")
+        if len(re.findall('[A-Z]+', multi_noun)) > 0 :
+            check_capitalize_multi_noun_socre = 1000 * len(re.findall('[A-Z]+', multi_noun)) / len(
+                multi_noun.replace(" ", ""))
+            result_multi_noun[multi_noun] = count + check_capitalize_multi_noun_socre
+    result_multi_noun = result_multi_noun + multi_noun_counter
+    return result_multi_noun
+
 
 def text_in_mult_noun_finder(multi_noun, multi_noun_score, text):
     text_in_multi_noun = []
@@ -396,15 +433,23 @@ def text_in_mult_noun_finder(multi_noun, multi_noun_score, text):
     return sorted_dict(text_in_multi_noun_result_score)
 
 
+def text_inside_check(text, multi_noun_counter):
+    multi_noun_counter_result = Counter({})
+
+    # split_text = text.split(" ")
+    text = text.strip()
+    for multi_noun, count in multi_noun_counter.items():
+        if len(text) > 0:
+            start_point = text.find(multi_noun)
+            end_point = start_point + len(multi_noun)
+            if start_point > 0 and text[start_point - 1] == ' ':
+                # if end_point < len(text)-1 and text[end_point+1] == ' ':
+                multi_noun_counter_result.update({ multi_noun : count})
+
+    return multi_noun_counter_result
+
 def extract_mecab_multi_noun(text, item_counter=0):
     text = text.strip()
-
-    multi_noun = []
-    multi_noun_score = {}
-    krword_rank_noun = []
-    krword_rank_noun_score = {}
-    krword_rank_once_noun = []
-    krword_rank_once_noun_score = {}
 
     multi_noun_counter = Counter({})
     krword_rank_noun_counter = Counter({})
@@ -433,6 +478,8 @@ def extract_mecab_multi_noun(text, item_counter=0):
                 for n in temp_noun:
                     if len(n.strip()) > 1 and n.find(" ") < 0:
                         start_position = sentence.find(n)
+                        if start_position > 0:
+                            start_position = start_position - 1
                         end_position = start_position + len(n)
                         if len(sentence) > end_position and sentence[end_position] != ' ':
                             end_position = sentence.find(' ', end_position + 1, len(sentence))
@@ -441,7 +488,7 @@ def extract_mecab_multi_noun(text, item_counter=0):
                                 word_cleansing = word[0:-1] + re.sub(
                                     '\'\([-=+,#/\?:^$.@*\"※~&%ㆍ!”』\\‘|\(\)\[\]\<\>`\'…》\^\)\(▶]', '', word[-1])
                             else:
-                                word_cleansing =  re.sub(
+                                word_cleansing = re.sub(
                                     '\'\([-=+,#/\?:^$.@*\"※~&%ㆍ!”』\\‘|\(\)\[\]\<\>`\'…》\^\)\(▶]', '', word)
                             # print(word_cleansing)
                             multi_noun_counter.update({word_cleansing: 0.75})
@@ -451,15 +498,15 @@ def extract_mecab_multi_noun(text, item_counter=0):
                             # print(word)
                 # print(multi_noun_counter)
         multi_noun_counter = check_stopword(multi_noun_counter)
-        multi_noun_counter = remove_last_one_char(multi_noun_counter)
+        # multi_noun_counter = remove_last_one_char(multi_noun_counter)
 
         krword_rank_noun_counter = krwordrank_noun(sentence_list=sentence_list, min_count=5)
         krword_rank_noun_counter = check_stopword(krword_rank_noun_counter)
-        krword_rank_noun_counter = remove_last_one_char(krword_rank_noun_counter)
+        # krword_rank_noun_counter = remove_last_one_char(krword_rank_noun_counter)
 
         krword_rank_once_noun_counter = krwordrank_noun(sentence_list=sentence_list, min_count=2)
         krword_rank_once_noun_counter = check_stopword(krword_rank_once_noun_counter)
-        krword_rank_once_noun_counter = remove_last_one_char(krword_rank_once_noun_counter)
+        # krword_rank_once_noun_counter = remove_last_one_char(krword_rank_once_noun_counter)
     # print(multi_noun_counter)
     # print(krword_rank_noun_counter)
     # print(krword_rank_once_noun_counter)
@@ -471,23 +518,21 @@ def extract_mecab_multi_noun(text, item_counter=0):
 
     # print("-" * 100)
 
-    multi_noun_counter_result = multi_noun_score_check(multi_noun_counter)
+    # multi_noun_counter = multi_noun_remove_special_char(multi_noun_counter)
+    # multi_noun_counter = multi_noun_remove_special_char(multi_noun_counter)
+    multi_noun_counter = with_word_add_score(multi_noun_counter)
+    multi_noun_counter = upper_char_add_score(multi_noun_counter)
 
-    # # print("0" * 100)
-    # # print(multi_noun, multi_noun_score)
-    # multi_noun, multi_noun_score = remove_stopword(multi_noun, multi_noun_score)
-    #
-    # # print("0" * 100)
-    # # print(multi_noun, multi_noun_score)
-    # # print(multi_noun_score)
-    # return_multi_noun, return_multi_noun_score = text_in_mult_noun_finder(multi_noun, multi_noun_score, text)
-    #
-    # if item_counter == 0:
-    #     return return_multi_noun, return_multi_noun_score
-    # else:
-    #     return return_multi_noun[:item_counter], dict(itertools.islice(return_multi_noun_score.items(), item_counter))
+    multi_noun_counter = remove_stopword(multi_noun_counter)
+    multi_noun_counter = multi_noun_remove_special_char(multi_noun_counter)
+    # print(multi_noun_counter)
 
-    return multi_noun_counter_result
+    # multi_noun_counter = text_inside_check(text, multi_noun_counter)
+    # print(multi_noun_counter)
+    # print(text.strip())
+
+
+    return multi_noun_counter
 
 
 # if __name__ == '__main__':
@@ -532,7 +577,7 @@ def extract_multi_noun(text, item_counter=0):
             text_array)
 
         multi_noun_counter = extract_mecab_multi_noun(text_array, item_counter=item_counter)
-        print(multi_noun_counter)
+        # print(multi_noun_counter)
         multi_noun_counter_result.update(multi_noun_counter)
         # if len(multi_noun_list):
         #     for index, word in enumerate(multi_noun_list):
