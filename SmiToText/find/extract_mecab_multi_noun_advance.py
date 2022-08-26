@@ -618,26 +618,11 @@ def extract_multi_noun(text, item_counter=0):
         #                 word_score = {word: multi_noun_list_score[word]}
         #                 line_array_multi_noun_score.update(word_score)
         #             # print(line_number, word)
-
+    sorted(multi_noun_counter_result.items(), key=lambda pair: pair[1], reverse=True)
     return multi_noun_counter_result
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Extract File Noun word")
-    parser.add_argument('--input', type=str, required=True, default='', help='Input File')
-    parser.add_argument('--output', type=str, required=True, default='', help='Output File')
-    args = parser.parse_args()
-
-    if not args.input:
-        print("input file is invalid!")
-        exit(1)
-
-    if not args.output:
-        print("output file is invalid!")
-        exit(1)
-
-    input = str(args.input)
-    output = str(args.output)
-
+    input = "test test"
     result = extract_multi_noun(input)
     print(result)
