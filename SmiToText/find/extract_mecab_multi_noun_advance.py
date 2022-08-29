@@ -282,7 +282,7 @@ def remove_stopword(multi_noun_counter, stop_word=[]):
     if len(stop_word) == 0 or stop_word == None:
         stop_word = copy.deepcopy(all_stop_word)
     stop_word.extend(stopwords.words('english'))
-
+    stop_word.append("th")
     for multi_noun, count in multi_noun_counter.items():
         if multi_noun not in stop_word \
                 and not Util().is_int(multi_noun) \
@@ -377,8 +377,8 @@ def upper_char_add_score(multi_noun_counter):
     result_multi_noun = Counter({})
     for multi_noun, count in multi_noun_counter.items():
         # print("--")
-        if len(re.findall('[A-Z]+', multi_noun)) > 0:
-            check_capitalize_multi_noun_socre = 10000 * len(re.findall('[A-Z]+', multi_noun)) / len(
+        if len(re.findall('[A-Z]', multi_noun)) > 0:
+            check_capitalize_multi_noun_socre = 10000 * len(re.findall('[A-Z]', multi_noun)) / len(
                 multi_noun.replace(" ", ""))
             result_multi_noun[multi_noun] = count + check_capitalize_multi_noun_socre
     result_multi_noun = result_multi_noun + multi_noun_counter
@@ -574,7 +574,6 @@ def extract_mecab_multi_noun(text, item_counter=0):
     # multi_noun_counter = multi_noun_remove_special_char(multi_noun_counter)
     # multi_noun_counter = multi_noun_remove_special_char(multi_noun_counter)
     multi_noun_counter = with_word_add_score(multi_noun_counter)
-    multi_noun_counter = upper_char_add_score(multi_noun_counter)
 
     multi_noun_counter = remove_stopword(multi_noun_counter)
     multi_noun_counter = multi_noun_remove_special_char(multi_noun_counter)
@@ -583,6 +582,7 @@ def extract_mecab_multi_noun(text, item_counter=0):
     multi_noun_counter = check_noisy(multi_noun_counter)
     multi_noun_counter = check_noisy(multi_noun_counter, remove_char="–")
     multi_noun_counter = remove_first_last_char(multi_noun_counter, loop=2)
+    multi_noun_counter = upper_char_add_score(multi_noun_counter)
 
     # multi_noun_counter = text_inside_check(text, multi_noun_counter)
     # print(multi_noun_counter)
