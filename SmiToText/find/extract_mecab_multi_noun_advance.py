@@ -377,7 +377,7 @@ def upper_char_add_score(multi_noun_counter):
     result_multi_noun = Counter({})
     for multi_noun, count in multi_noun_counter.items():
         # print("--")
-        if len(re.findall('[A-Z]+', multi_noun)) > 0 :
+        if len(re.findall('[A-Z]+', multi_noun)) > 0:
             check_capitalize_multi_noun_socre = 10000 * len(re.findall('[A-Z]+', multi_noun)) / len(
                 multi_noun.replace(" ", ""))
             result_multi_noun[multi_noun] = count + check_capitalize_multi_noun_socre
@@ -444,7 +444,7 @@ def text_inside_check(text, multi_noun_counter):
             end_point = start_point + len(multi_noun)
             if start_point > 0 and text[start_point - 1] == ' ':
                 # if end_point < len(text)-1 and text[end_point+1] == ' ':
-                multi_noun_counter_result.update({ multi_noun : count})
+                multi_noun_counter_result.update({multi_noun: count})
 
     return multi_noun_counter_result
 
@@ -453,8 +453,12 @@ def check_noisy(multi_noun_counter):
     multi_noun_counter_result = Counter({})
     for multi_noun, count in multi_noun_counter.items():
         if len(multi_noun.strip()) > 1:
-            multi_noun_counter_result.update({ multi_noun.strip() : count})
+            if multi_noun.strip().startwith("—"):
+                multi_noun_counter_result.update({multi_noun.strip().replace("—", ""): count})
+            else:
+                multi_noun_counter_result.update({multi_noun.strip(): count})
     return multi_noun_counter_result
+
 
 def extract_mecab_multi_noun(text, item_counter=0):
     text = text.strip()
@@ -534,13 +538,12 @@ def extract_mecab_multi_noun(text, item_counter=0):
     multi_noun_counter = remove_stopword(multi_noun_counter)
     multi_noun_counter = multi_noun_remove_special_char(multi_noun_counter)
     # print(multi_noun_counter)
-    
+
     multi_noun_counter = check_noisy(multi_noun_counter)
 
     # multi_noun_counter = text_inside_check(text, multi_noun_counter)
     # print(multi_noun_counter)
     # print(text.strip())
-
 
     return multi_noun_counter
 
