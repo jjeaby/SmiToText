@@ -489,6 +489,8 @@ def remove_one_char(multi_noun_counter):
                 temp_clean_multi_none = ' '.join(clean_multi_none_token[1:]).strip()
             elif len(clean_multi_none_token[-1]) == 1:
                 temp_clean_multi_none = ' '.join(clean_multi_none_token[:-1]).strip()
+            else:
+                temp_clean_multi_none = clean_multi_noun
             multi_noun_counter_result.update({temp_clean_multi_none: count})
     return multi_noun_counter_result
 
@@ -580,7 +582,7 @@ def extract_mecab_multi_noun(text, item_counter=0):
 
     multi_noun_counter = check_noisy(multi_noun_counter)
     multi_noun_counter = check_noisy(multi_noun_counter, remove_char="–")
-    multi_noun_counter = remove_one_char(multi_noun_counter)
+    multi_noun_counter = remove_first_last_char(multi_noun_counter, loop=2)
 
     # multi_noun_counter = text_inside_check(text, multi_noun_counter)
     # print(multi_noun_counter)
