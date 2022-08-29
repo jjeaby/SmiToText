@@ -452,9 +452,10 @@ def text_inside_check(text, multi_noun_counter):
 def check_noisy(multi_noun_counter):
     multi_noun_counter_result = Counter({})
     for multi_noun, count in multi_noun_counter.items():
-        if len(multi_noun.strip()) > 1:
-            if multi_noun.strip().startwith("—"):
-                multi_noun_counter_result.update({multi_noun.strip().replace("—", ""): count})
+        clean_multi_noun = str(multi_noun.strip())
+        if len(clean_multi_noun) > 1:
+            if clean_multi_noun.startswith("—"):
+                multi_noun_counter_result.update({clean_multi_noun[1:]: count})
             else:
                 multi_noun_counter_result.update({multi_noun.strip(): count})
     return multi_noun_counter_result
