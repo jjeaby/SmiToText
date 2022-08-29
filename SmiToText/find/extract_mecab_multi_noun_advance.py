@@ -449,15 +449,28 @@ def text_inside_check(text, multi_noun_counter):
     return multi_noun_counter_result
 
 
-def check_noisy(multi_noun_counter):
+def check_noisy(multi_noun_counter, remove_char="—"):
     multi_noun_counter_result = Counter({})
     for multi_noun, count in multi_noun_counter.items():
         clean_multi_noun = str(multi_noun.strip())
         if len(clean_multi_noun) > 1:
-            if clean_multi_noun.startswith("—"):
-                multi_noun_counter_result.update({clean_multi_noun[1:]: count})
+            if clean_multi_noun.startswith(remove_char):
+                remove_start_index = 0
+                for index, char in enumerate(clean_multi_noun):
+                    if char == remove_char:
+                        remove_start_index = index
+                    else:
+                        break
+                if remove_start_index < len(clean_multi_noun):
+                    remove_start_index_noun = clean_multi_noun[remove_start_index + 1:]
+                else:
+                    remove_start_index_noun = clean_multi_noun[remove_start_index + 1:]
+
+                if len(remove_start_index_noun) > 1:
+                    multi_noun_counter_result.update({remove_start_index_noun: count})
             else:
-                multi_noun_counter_result.update({multi_noun.strip(): count})
+                if len(clean_multi_noun) > 1:
+                    multi_noun_counter_result.update({multi_noun.strip(): count})
     return multi_noun_counter_result
 
 
@@ -541,6 +554,7 @@ def extract_mecab_multi_noun(text, item_counter=0):
     # print(multi_noun_counter)
 
     multi_noun_counter = check_noisy(multi_noun_counter)
+    multi_noun_counter = check_noisy(multi_noun_counter, remove_char="–")
 
     # multi_noun_counter = text_inside_check(text, multi_noun_counter)
     # print(multi_noun_counter)
