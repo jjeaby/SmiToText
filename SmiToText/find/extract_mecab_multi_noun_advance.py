@@ -474,6 +474,31 @@ def check_noisy(multi_noun_counter, remove_char="—"):
     return multi_noun_counter_result
 
 
+def remove_one_char(multi_noun_counter):
+    multi_noun_counter_result = Counter({})
+
+    for multi_noun, count in multi_noun_counter.items():
+        clean_multi_noun = str(multi_noun.strip())
+        clean_multi_none_token = clean_multi_noun.split(" ")
+
+        if len(clean_multi_noun) >= 1 and len(clean_multi_none_token) > 0:
+            temp_clean_multi_none = ""
+            if len(clean_multi_none_token[0]) == 1 and len(clean_multi_none_token[-1]) == 1:
+                temp_clean_multi_none = ' '.join(clean_multi_none_token[1:-1]).strip()
+            elif len(clean_multi_none_token[0]) == 1:
+                temp_clean_multi_none = ' '.join(clean_multi_none_token[1:]).strip()
+            elif len(clean_multi_none_token[-1]) == 1:
+                temp_clean_multi_none = ' '.join(clean_multi_none_token[:-1]).strip()
+            multi_noun_counter_result.update({temp_clean_multi_none: count})
+    return multi_noun_counter_result
+
+
+def remove_first_last_char(multi_noun_counter, loop=1):
+    for i in range(0, loop):
+        multi_noun_counter = remove_one_char(multi_noun_counter)
+    return multi_noun_counter
+
+
 def extract_mecab_multi_noun(text, item_counter=0):
     text = text.strip()
 
@@ -555,6 +580,7 @@ def extract_mecab_multi_noun(text, item_counter=0):
 
     multi_noun_counter = check_noisy(multi_noun_counter)
     multi_noun_counter = check_noisy(multi_noun_counter, remove_char="–")
+    multi_noun_counter = remove_one_char(multi_noun_counter)
 
     # multi_noun_counter = text_inside_check(text, multi_noun_counter)
     # print(multi_noun_counter)
