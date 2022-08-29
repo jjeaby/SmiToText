@@ -6,12 +6,16 @@ SmiToText.egg-info/PKG-INFO
 SmiToText.egg-info/SOURCES.txt
 SmiToText.egg-info/dependency_links.txt
 SmiToText.egg-info/not-zip-safe
+SmiToText.egg-info/requires.txt
 SmiToText.egg-info/top_level.txt
 SmiToText/find/__init__.py
 SmiToText/find/extract_kakao_noun.py
 SmiToText/find/extract_konlply_noun.py
+SmiToText/find/extract_mecab_multi_noun.py
+SmiToText/find/extract_mecab_multi_noun_advance.py
 SmiToText/find/extract_mecab_nng.py
 SmiToText/find/extract_mecab_noun.py
+SmiToText/font/__init__.py
 SmiToText/frequency/__init__.py
 SmiToText/frequency/word.py
 SmiToText/mecab/__init__.py
