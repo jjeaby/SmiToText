@@ -283,6 +283,7 @@ def remove_stopword(multi_noun_counter, stop_word=[]):
         stop_word = copy.deepcopy(all_stop_word)
     stop_word.extend(stopwords.words('english'))
     stop_word.append("th")
+    stop_word.append("Th")
     for multi_noun, count in multi_noun_counter.items():
         if multi_noun not in stop_word \
                 and not Util().is_int(multi_noun) \
@@ -378,10 +379,22 @@ def upper_char_add_score(multi_noun_counter):
     for multi_noun, count in multi_noun_counter.items():
         # print("--")
         if len(re.findall('[A-Z]', multi_noun)) > 0:
-            check_capitalize_multi_noun_socre = 10000 * len(re.findall('[A-Z]', multi_noun)) / len(
-                multi_noun.replace(" ", ""))
+            check_capitalize_multi_noun_socre = 10000 * (len(re.findall('[A-Z]', multi_noun)) / len(
+                multi_noun.replace(" ", "")))
             result_multi_noun[multi_noun] = count + check_capitalize_multi_noun_socre
     result_multi_noun = result_multi_noun + multi_noun_counter
+    return result_multi_noun
+
+def check_with_in_text(text, multi_noun_counter):
+    text_token = text.split(' ')
+    result_multi_noun = Counter({})
+    for multi_noun, count in multi_noun_counter.items():
+        # print("--")
+        if len(multi_noun.split(' ')) == 1:
+            if multi_noun in text_token:
+                result_multi_noun.update({multi_noun: count})
+        else:
+            result_multi_noun.update({multi_noun: count})
     return result_multi_noun
 
 
@@ -582,7 +595,7 @@ def extract_mecab_multi_noun(text, item_counter=0):
     multi_noun_counter = check_noisy(multi_noun_counter)
     multi_noun_counter = check_noisy(multi_noun_counter, remove_char="–")
     multi_noun_counter = remove_first_last_char(multi_noun_counter, loop=2)
-    multi_noun_counter = upper_char_add_score(multi_noun_counter)
+    # multi_noun_counter = upper_char_add_score(multi_noun_counter)
 
     # multi_noun_counter = text_inside_check(text, multi_noun_counter)
     # print(multi_noun_counter)
@@ -633,8 +646,8 @@ def extract_multi_noun(text, item_counter=0):
             text_array)
 
         multi_noun_counter = extract_mecab_multi_noun(text_array, item_counter=item_counter)
-        # print(multi_noun_counter)
         multi_noun_counter_result.update(multi_noun_counter)
+        # print(multi_noun_counter)
         # if len(multi_noun_list):
         #     for index, word in enumerate(multi_noun_list):
         #         if Util().check_email(word):
@@ -664,6 +677,9 @@ def extract_multi_noun(text, item_counter=0):
         #                 word_score = {word: multi_noun_list_score[word]}
         #                 line_array_multi_noun_score.update(word_score)
         #             # print(line_number, word)
+    multi_noun_counter_result = upper_char_add_score(multi_noun_counter_result)
+    multi_noun_counter_result = check_with_in_text(text, multi_noun_counter_result)
+
     sorted(multi_noun_counter_result.items(), key=lambda pair: pair[1], reverse=True)
     return multi_noun_counter_result
 
