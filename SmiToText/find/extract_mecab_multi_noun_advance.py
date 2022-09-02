@@ -377,10 +377,20 @@ def with_word_add_score(multi_noun_counter):
 def upper_char_add_score(multi_noun_counter):
     result_multi_noun = Counter({})
     for multi_noun, count in multi_noun_counter.items():
-        # print("--")
+        check_capitalize_multi_noun_socre = 0
         if len(re.findall('[A-Z]', multi_noun)) > 0:
-            check_capitalize_multi_noun_socre = 10000 * (len(re.findall('[A-Z]', multi_noun)) / len(
-                multi_noun.replace(" ", "")))
+            multi_noun_token = multi_noun.split(' ')
+            if len(multi_noun_token) > 1:
+                token_first_upper_check_counter = 0
+                for multi_noun_token_word in multi_noun_token:
+                    if len(re.findall('[A-Z]+', multi_noun_token_word[0])) == 1:
+                        token_first_upper_check_counter+1
+                if token_first_upper_check_counter == len(multi_noun_token):
+                    check_capitalize_multi_noun_socre = 10000
+
+            if check_capitalize_multi_noun_socre != 10000:
+                check_capitalize_multi_noun_socre = 10000 * (len(re.findall('[A-Z]', multi_noun)) / len(
+                    multi_noun.replace(" ", "")))
             result_multi_noun[multi_noun] = count + check_capitalize_multi_noun_socre
     result_multi_noun = result_multi_noun + multi_noun_counter
     return result_multi_noun
@@ -647,36 +657,7 @@ def extract_multi_noun(text, item_counter=0):
 
         multi_noun_counter = extract_mecab_multi_noun(text_array, item_counter=item_counter)
         multi_noun_counter_result.update(multi_noun_counter)
-        # print(multi_noun_counter)
-        # if len(multi_noun_list):
-        #     for index, word in enumerate(multi_noun_list):
-        #         if Util().check_email(word):
-        #             continue
-        #         else:
-        #             add_flag = True
-        #             for char in word:
-        #                 if char in ["'", "`", ",", "'", "\"", "|", "!", "@", "#", "$", "%", "^", "&", "*", "(",
-        #                             ")", "“",
-        #                             "-", "_", "=", "+", "<", ">", ".", ";", ":",
-        #                             "ㄱ", "ㄴ", "ㄲ", "ㅂ", "ㅃ", "ㅈ", "ㅉ", "ㄷ", "ㄸ", "ㄱ", "ㅁ", "ㅇ", "ㄹ", "ㅎ", "ㅅ",
-        #                             "ㅆ",
-        #                             "ㅍ", "ㅊ", "ㅌ", "ㅋ", "ㅛ", "ㅕ", "ㅑ", "ㅐ", "ㅔ", "ㅗ", "ㅓ", "ㅏ", "ㅣ", "ㅠ", "ㅜ",
-        #                             "ㅡ", " "]:
-        #                     add_flag = False
-        #
-        #             if word == '기자' or word == str(date.today().day) + '일' \
-        #                     or word.strip() == "" \
-        #                     or len(word.strip()) == 1 \
-        #                     :
-        #                 add_flag = False
-        #
-        #             if check_en_stopword(word):
-        #                 add_flag = False
-        #
-        #             if add_flag:
-        #                 word_score = {word: multi_noun_list_score[word]}
-        #                 line_array_multi_noun_score.update(word_score)
-        #             # print(line_number, word)
+
     multi_noun_counter_result = upper_char_add_score(multi_noun_counter_result)
     multi_noun_counter_result = check_with_in_text(text, multi_noun_counter_result)
 
