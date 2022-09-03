@@ -384,7 +384,7 @@ def upper_char_add_score(multi_noun_counter):
                 token_first_upper_check_counter = 0
                 for multi_noun_token_word in multi_noun_token:
                     if len(re.findall('[A-Z]+', multi_noun_token_word[0])) == 1:
-                        token_first_upper_check_counter+1
+                        token_first_upper_check_counter+=1
                 if token_first_upper_check_counter == len(multi_noun_token):
                     check_capitalize_multi_noun_socre = 10000
 
@@ -666,6 +666,6 @@ def extract_multi_noun(text, item_counter=0):
 
 
 if __name__ == '__main__':
-    input = "test test"
+    input = "Test Test"
     result = extract_multi_noun(input)
     print(result)
