@@ -264,7 +264,7 @@ def krwordrank_noun(sentence_list=[], min_count=5, max_length=10, beta=0.85, max
         for word, r in sorted(keywords.items(), key=lambda x: x[1], reverse=True)[:len(keywords)]:
             # print(r, word)
             word = re.sub("[\s]+", " ", word)
-            if len(word) > 1:
+            if len(word) > 1 and isinstance(word.strip(), (int, float)) is False:
                 word_cleansing = word[0: -1] + re.sub('[-=+,#/\?:^$.@*\"※~&%ㆍ!”』\\‘|\(\)\[\]\<\>`\'…》\^\)\(▶]', '',
                                                       word[-1])
                 word_cleansing = word_cleansing.strip()
@@ -311,6 +311,14 @@ def check_stopword(multi_noun_counter, stop_word=[]):
                 and not str(noun).endswith('이다'):
             check_multi_noun_counter[noun] = multi_noun_counter[noun]
 
+    return check_multi_noun_counter
+
+
+def check_all_number(multi_noun_counter):
+    check_multi_noun_counter = Counter({})
+    for noun in multi_noun_counter:
+        if isinstance(noun.strip(), (int, float)) is False:
+            check_multi_noun_counter[noun] = multi_noun_counter[noun]
     return check_multi_noun_counter
 
 
@@ -384,7 +392,7 @@ def upper_char_add_score(multi_noun_counter):
                 token_first_upper_check_counter = 0
                 for multi_noun_token_word in multi_noun_token:
                     if len(re.findall('[A-Z]+', multi_noun_token_word[0])) == 1:
-                        token_first_upper_check_counter+=1
+                        token_first_upper_check_counter += 1
                 if token_first_upper_check_counter == len(multi_noun_token):
                     check_capitalize_multi_noun_socre = 10000
 
@@ -394,6 +402,7 @@ def upper_char_add_score(multi_noun_counter):
             result_multi_noun[multi_noun] = count + check_capitalize_multi_noun_socre
     result_multi_noun = result_multi_noun + multi_noun_counter
     return result_multi_noun
+
 
 def check_with_in_text(text, multi_noun_counter):
     text_token = text.split(' ')
@@ -560,7 +569,7 @@ def extract_mecab_multi_noun(text, item_counter=0):
                         if len(sentence) > end_position and sentence[end_position] != ' ':
                             end_position = sentence.find(' ', end_position + 1, len(sentence))
                             word = sentence[start_position:end_position].strip()
-                            if len(word) > 1:
+                            if len(word) > 1 and isinstance(word.strip(), (int, float)) is False:
                                 word_cleansing = word[0:-1] + re.sub(
                                     '\'\([-=+,#/\?:^$.@*\"※~&%ㆍ!”』\\‘|\(\)\[\]\<\>`\'…》\^\)\(▶]', '', word[-1])
                             else:
@@ -582,6 +591,7 @@ def extract_mecab_multi_noun(text, item_counter=0):
 
         krword_rank_once_noun_counter = krwordrank_noun(sentence_list=sentence_list, min_count=2)
         krword_rank_once_noun_counter = check_stopword(krword_rank_once_noun_counter)
+        krword_rank_once_noun_counter = check_all_number(krword_rank_once_noun_counter)
         # krword_rank_once_noun_counter = remove_last_one_char(krword_rank_once_noun_counter)
     # print(multi_noun_counter)
     # print(krword_rank_noun_counter)
