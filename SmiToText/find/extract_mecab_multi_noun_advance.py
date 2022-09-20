@@ -295,7 +295,7 @@ def remove_stopword(multi_noun_counter, stop_word=[]):
 
 
 def check_stopword(multi_noun_counter, stop_word=[]):
-    if len(stop_word) == 0 or stop_word == None:
+    if len(stop_word) == 0 or stop_word is None:
         stop_word = all_stop_word
     check_multi_noun_counter = Counter({})
 
@@ -313,11 +313,36 @@ def check_stopword(multi_noun_counter, stop_word=[]):
 
     return check_multi_noun_counter
 
+def check_int_or_float(input):
+    try:
+        int(input)
+        # print("["+input+"]")
+        return True
+    except:
+        try:
+            float(input)
+            # print("[" + input + "]")
+            return True
+        except:
+            return False
+
 
 def check_all_number(multi_noun_counter):
     check_multi_noun_counter = Counter({})
     for noun in multi_noun_counter:
-        if isinstance(noun.strip(), (int, float)) is False:
+        if check_int_or_float(noun.strip()) is False:
+            check_multi_noun_counter[noun] = multi_noun_counter[noun]
+    return check_multi_noun_counter
+
+def check_short_word(multi_noun_counter, limit_len=2):
+    check_multi_noun_counter = Counter({})
+    for noun in multi_noun_counter:
+        noun_len = len(noun.strip())
+        if noun_len <= limit_len:
+            lower_char_len = len(re.findall('[a-z]', noun))
+            if noun_len != lower_char_len:
+                check_multi_noun_counter[noun] = multi_noun_counter[noun]
+        else:
             check_multi_noun_counter[noun] = multi_noun_counter[noun]
     return check_multi_noun_counter
 
@@ -583,43 +608,34 @@ def extract_mecab_multi_noun(text, item_counter=0):
                             # print(word)
                 # print(multi_noun_counter)
         multi_noun_counter = check_stopword(multi_noun_counter)
-        # multi_noun_counter = remove_last_one_char(multi_noun_counter)
+        # multi_noun_counter = check_short_word(multi_noun_counter)
+        # multi_noun_counter = check_all_number(multi_noun_counter)
 
         krword_rank_noun_counter = krwordrank_noun(sentence_list=sentence_list, min_count=5)
         krword_rank_noun_counter = check_stopword(krword_rank_noun_counter)
-        # krword_rank_noun_counter = remove_last_one_char(krword_rank_noun_counter)
+        # krword_rank_noun_counter = check_short_word(krword_rank_noun_counter)
+        # krword_rank_noun_counter = check_all_number(krword_rank_noun_counter)
 
         krword_rank_once_noun_counter = krwordrank_noun(sentence_list=sentence_list, min_count=2)
         krword_rank_once_noun_counter = check_stopword(krword_rank_once_noun_counter)
-        krword_rank_once_noun_counter = check_all_number(krword_rank_once_noun_counter)
-        # krword_rank_once_noun_counter = remove_last_one_char(krword_rank_once_noun_counter)
-    # print(multi_noun_counter)
-    # print(krword_rank_noun_counter)
-    # print(krword_rank_once_noun_counter)
+        # krword_rank_once_noun_counter = check_short_word(krword_rank_once_noun_counter)
+        # krword_rank_once_noun_counter = check_all_number(krword_rank_once_noun_counter)
+
 
     multi_noun_counter.update(krword_rank_noun_counter)
     multi_noun_counter.update(krword_rank_once_noun_counter)
 
-    # print(multi_noun_counter)
 
-    # print("-" * 100)
-
-    # multi_noun_counter = multi_noun_remove_special_char(multi_noun_counter)
-    # multi_noun_counter = multi_noun_remove_special_char(multi_noun_counter)
     multi_noun_counter = with_word_add_score(multi_noun_counter)
 
     multi_noun_counter = remove_stopword(multi_noun_counter)
+    multi_noun_counter = check_short_word(multi_noun_counter, limit_len=2)
+    multi_noun_counter = check_all_number(multi_noun_counter)
     multi_noun_counter = multi_noun_remove_special_char(multi_noun_counter)
-    # print(multi_noun_counter)
 
     multi_noun_counter = check_noisy(multi_noun_counter)
     multi_noun_counter = check_noisy(multi_noun_counter, remove_char="–")
     multi_noun_counter = remove_first_last_char(multi_noun_counter, loop=2)
-    # multi_noun_counter = upper_char_add_score(multi_noun_counter)
-
-    # multi_noun_counter = text_inside_check(text, multi_noun_counter)
-    # print(multi_noun_counter)
-    # print(text.strip())
 
     return multi_noun_counter
 
@@ -676,6 +692,8 @@ def extract_multi_noun(text, item_counter=0):
 
 
 if __name__ == '__main__':
-    input = "Test Test"
+    input = "act act Act  tes Tes 22\n 22 22 22 \n2222 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 "
     result = extract_multi_noun(input)
     print(result)
+
+    print(check_int_or_float("22"))
