@@ -629,13 +629,14 @@ def extract_mecab_multi_noun(text, item_counter=0):
     multi_noun_counter = with_word_add_score(multi_noun_counter)
 
     multi_noun_counter = remove_stopword(multi_noun_counter)
-    multi_noun_counter = check_short_word(multi_noun_counter, limit_len=2)
-    multi_noun_counter = check_all_number(multi_noun_counter)
     multi_noun_counter = multi_noun_remove_special_char(multi_noun_counter)
 
     multi_noun_counter = check_noisy(multi_noun_counter)
     multi_noun_counter = check_noisy(multi_noun_counter, remove_char="–")
     multi_noun_counter = remove_first_last_char(multi_noun_counter, loop=2)
+
+    multi_noun_counter = check_short_word(multi_noun_counter, limit_len=3)
+    multi_noun_counter = check_all_number(multi_noun_counter)
 
     return multi_noun_counter
 
@@ -692,7 +693,7 @@ def extract_multi_noun(text, item_counter=0):
 
 
 if __name__ == '__main__':
-    input = "act act Act  tes Tes 22\n 22 22 22 \n2222 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 "
+    input = "use use Use act act Act  tes Tes 22\n 22 22 22 \n2222 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 "
     result = extract_multi_noun(input)
     print(result)
 
