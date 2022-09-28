@@ -29,7 +29,7 @@ install_requires = [
 
 setup(
     name='SmiToText',
-    version='0.1664',
+    version='0.1665',
     py_modules = ['SmiToText', 'SmiToText.font'],
     packages=find_packages(exclude=['tests']),
     package_dir={'SmiToText': 'SmiToText'},

@@ -313,6 +313,7 @@ def check_stopword(multi_noun_counter, stop_word=[]):
 
     return check_multi_noun_counter
 
+
 def check_int_or_float(input):
     try:
         int(input)
@@ -327,12 +328,35 @@ def check_int_or_float(input):
             return False
 
 
+def remove_ko_josaword(multi_noun_counter):
+    check_multi_noun_counter = copy.deepcopy(multi_noun_counter)
+    josa = ['의', '이나마', '나마', '에게서', '으로서', '밖에', '은', '로이', '는', '랑', '으로', '에', '부터', '조차', '한테서', '아', '보다', '해야',
+            '로서', '나', '이라도', '와는', '과는', '이든지', '며', '가', '이나', '에게', '를', '을', '로써', '야', '이다', '다', '만', '와', '마저',
+            '든지', '까지', '으', '뿐', '으로써', '과', '에서']
+    for noun in multi_noun_counter:
+        for jo in josa:
+            if str(noun + jo) in multi_noun_counter.keys():
+                del check_multi_noun_counter[str(noun + jo)]
+    return check_multi_noun_counter
+
+def check_mecab_nng(multi_noun_counter, word_list_frequency):
+    check_multi_noun_counter = Counter({})
+    check_multi_noun_frequency_counter = Counter({})
+    for noun in multi_noun_counter:
+        result_word_list, _ = expect_multi_noun_text_ko(noun.strip())
+        for result_word in result_word_list:
+            check_multi_noun_counter[result_word] = multi_noun_counter[noun]
+            check_multi_noun_frequency_counter[result_word] = word_list_frequency[noun]
+    return check_multi_noun_counter, check_multi_noun_frequency_counter
+
+
 def check_all_number(multi_noun_counter):
     check_multi_noun_counter = Counter({})
     for noun in multi_noun_counter:
         if check_int_or_float(noun.strip()) is False:
             check_multi_noun_counter[noun] = multi_noun_counter[noun]
     return check_multi_noun_counter
+
 
 def check_short_word(multi_noun_counter, limit_len=2):
     check_multi_noun_counter = Counter({})
@@ -558,7 +582,7 @@ def remove_first_last_char(multi_noun_counter, loop=1):
     return multi_noun_counter
 
 
-def extract_mecab_multi_noun(text, item_counter=0):
+def extract_mecab_multi_noun(text, lang='en', item_counter=0):
     text = text.strip()
 
     multi_noun_counter = Counter({})
@@ -583,7 +607,6 @@ def extract_mecab_multi_noun(text, item_counter=0):
                 # print(second_multi_noun_counter)
                 multi_noun_counter.update(second_multi_noun_counter)
                 # print(multi_noun_counter)
-
                 temp_noun = copy.deepcopy(multi_noun_counter)
                 for n in temp_noun:
                     if len(n.strip()) > 1 and n.find(" ") < 0:
@@ -606,7 +629,6 @@ def extract_mecab_multi_noun(text, item_counter=0):
                             word = sentence[start_position:end_position].strip()
                             multi_noun_counter.update({word: 0.75})
                             # print(word)
-                # print(multi_noun_counter)
         multi_noun_counter = check_stopword(multi_noun_counter)
         # multi_noun_counter = check_short_word(multi_noun_counter)
         # multi_noun_counter = check_all_number(multi_noun_counter)
@@ -621,10 +643,8 @@ def extract_mecab_multi_noun(text, item_counter=0):
         # krword_rank_once_noun_counter = check_short_word(krword_rank_once_noun_counter)
         # krword_rank_once_noun_counter = check_all_number(krword_rank_once_noun_counter)
 
-
     multi_noun_counter.update(krword_rank_noun_counter)
     multi_noun_counter.update(krword_rank_once_noun_counter)
-
 
     multi_noun_counter = with_word_add_score(multi_noun_counter)
 
@@ -637,6 +657,8 @@ def extract_mecab_multi_noun(text, item_counter=0):
 
     multi_noun_counter = check_short_word(multi_noun_counter, limit_len=3)
     multi_noun_counter = check_all_number(multi_noun_counter)
+    if lang == 'ko':
+        multi_noun_counter = remove_ko_josaword(multi_noun_counter)
 
     return multi_noun_counter
 
@@ -669,7 +691,7 @@ def extract_file_multi_noun(input, output, item_counter=0):
         line_number += 1
 
 
-def extract_multi_noun(text, item_counter=0):
+def extract_multi_noun(text, lang='en', item_counter=0):
     text = text.strip()
     multi_noun_counter_result = Counter({})
     for text_array in text.split("\n"):
@@ -682,11 +704,14 @@ def extract_multi_noun(text, item_counter=0):
             r'(http|ftp|https)://([\w+?\.\w+])+([a-zA-Z0-9\~\!\@\#\$\%\^\&\*\(\)_\-\=\+\\\/\?\.\:\;\'\,]*)?', '',
             text_array)
 
-        multi_noun_counter = extract_mecab_multi_noun(text_array, item_counter=item_counter)
+        multi_noun_counter = extract_mecab_multi_noun(text_array, lang=lang, item_counter=item_counter)
         multi_noun_counter_result.update(multi_noun_counter)
 
     multi_noun_counter_result = upper_char_add_score(multi_noun_counter_result)
-    multi_noun_counter_result = check_with_in_text(text, multi_noun_counter_result)
+    if lang == 'en':
+        multi_noun_counter_result = check_with_in_text(text, multi_noun_counter_result)
+    if lang == 'ko':
+        multi_noun_counter_result = remove_ko_josaword(multi_noun_counter_result)
 
     sorted(multi_noun_counter_result.items(), key=lambda pair: pair[1], reverse=True)
     return multi_noun_counter_result
@@ -697,4 +722,6 @@ if __name__ == '__main__':
     result = extract_multi_noun(input)
     print(result)
 
+    result = expect_multi_noun_text_ko('UNGC(유엔세계기업협약)의')
+    print(result)
     print(check_int_or_float("22"))
